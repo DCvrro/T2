@@ -32,7 +32,7 @@ def leer():
                 ###Ingreso los tiempos asociados a la cantidad y de cada uav.
             if(count == 2 ):
                 if 'times' in uav: ## Reviso si ya existe la seccion de registros de tiempos en el diccionario
-                    if len(uav['times']) < uav.get('cantidad'): #Los voy ingresando si es que no cumplen con la cantidad dedatos dichos.
+                    if len(uav['times']) < int((uav.get('cantidad'))[0]): #Los voy ingresando si es que no cumplen con la cantidad dedatos dichos.
                         for datos in lines: 
                             uav['times'].append(datos)
                     else:
