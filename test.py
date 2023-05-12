@@ -4,6 +4,7 @@ def leer():
         count = 0
         uav = {}
         drones = []
+
         for lines in file.readlines():
             lines = lines.split(' ')
 
@@ -18,11 +19,15 @@ def leer():
             ##### Ingreso al diccionario #####
             if count == 0: ### Ingreso datos Cantidad de uavs
                 uav['cantidad'] = lines
+                temp = lines
                 count = 1
                 continue
 
                 ### Ingreso informacion de tiempos
             if count == 1 and len(lines) == 3:
+                if('cantidad' not in uav):
+                    uav['cantidad'] = temp
+
                 uav['botTime'] = lines[0]
                 uav['midTime'] = lines[1]
                 uav['topTime'] = lines[-1]
@@ -38,16 +43,14 @@ def leer():
                     else:
                         count = 1  
                         drones.append(uav)
-                        del uav['botTime']
-                        del uav['midTime']
-                        del uav['topTime']
-                        del uav['times']   
+                        uav.clear()  
                 else: # en caso contrario los creo y empieza a ingresar dentro del diccionario
                     for datos in lines:
                         if 'times' in uav: 
                             uav['times'].append(datos)
                         else:
                             uav['times'] = [datos]
+    print(drones) 
     print((drones[0]).get('cantidad'))
     for drone in drones: 
         print('botTime:',(drone.get('botTime')))  
