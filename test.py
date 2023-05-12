@@ -37,13 +37,21 @@ def leer():
                             uav['times'].append(datos)
                     else:
                         count = 1  
+                        drones.append(uav)
+                        del uav['botTime']
+                        del uav['midTime']
+                        del uav['topTime']
+                        del uav['times']   
                 else: # en caso contrario los creo y empieza a ingresar dentro del diccionario
                     for datos in lines:
                         if 'times' in uav: 
                             uav['times'].append(datos)
                         else:
                             uav['times'] = [datos]
-
-        print(uav) 
-        
-leer() 
+    print((drones[0]).get('cantidad'))
+    for drone in drones: 
+        print('botTime:',(drone.get('botTime')))  
+        print('midTime:',(drone.get('midTime')))
+        print('topTime:',(drone.get('topTime')))
+        print('Tiempos:', drone.get('times')) 
+leer()
