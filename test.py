@@ -1,7 +1,9 @@
 def leer():
-    uav = {}
+    
     with open('t2_Titan.txt','r+') as file:
         count = 0
+        uav = {}
+        drones = []
         for lines in file.readlines():
             lines = lines.split(' ')
 
@@ -18,13 +20,29 @@ def leer():
                 uav['cantidad'] = lines
                 count = 1
                 continue
+
                 ### Ingreso informacion de tiempos
             if count == 1 and len(lines) == 3:
                 uav['botTime'] = lines[0]
                 uav['midTime'] = lines[1]
                 uav['topTime'] = lines[-1]
-
                 count = 2
+                continue
+                
+                ###Ingreso los tiempos asociados a la cantidad y de cada uav.
+            if(count == 2 ):
+                if 'times' in uav: ## Reviso si ya existe la seccion de registros de tiempos en el diccionario
+                    if len(uav['times']) < uav.get('cantidad'): #Los voy ingresando si es que no cumplen con la cantidad dedatos dichos.
+                        for datos in lines: 
+                            uav['times'].append(datos)
+                    else:
+                        count = 1  
+                else: # en caso contrario los creo y empieza a ingresar dentro del diccionario
+                    for datos in lines:
+                        if 'times' in uav: 
+                            uav['times'].append(datos)
+                        else:
+                            uav['times'] = [datos]
 
         print(uav) 
         
