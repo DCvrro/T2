@@ -3,6 +3,7 @@ def leer():
     with open('t2_Titan.txt','r+') as file:
         count = 0
         uav = {}
+        id = 1 
         tiempos = []
         times = []
         for lines in file.readlines():
@@ -25,11 +26,13 @@ def leer():
                 ### Ingreso informacion de tiempos
             if count == 1 and len(lines) == 3:
                 uav = {
+                    'id': id,
                     'botTime':0,
                     'midTime':0,
                     'topTime':0,
                     'times':[]
                 }
+                id = id + 1
                 times = []
                 uav['botTime'] = int(lines[0])
                 uav['midTime'] = int(lines[1])
@@ -73,7 +76,7 @@ if __name__ == '__main__':
             print("UAVs :", large  ) 
             b = False
         else:
-            print('Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime')) 
+            print(' ID :',uav.get('id')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime')) 
 
     ### Para el primer greedy se recomienda ordenar los uavs sgn el tipo de tiempo que se prefiera, creo que el mejor
     #puede ser ordenar por el tiempo  preferente.
