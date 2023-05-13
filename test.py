@@ -74,4 +74,7 @@ if __name__ == '__main__':
             b = False
         else:
             print('Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime')) 
+
+    ### Para el primer greedy se recomienda ordenar los uavs sgn el tipo de tiempo que se prefiera, creo que el mejor
+    #puede ser ordenar por el tiempo  preferente.
     
