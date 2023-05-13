@@ -49,19 +49,9 @@ def leer():
                         times.extend(tiempos)
                         tiempos.clear()
                         if len(times) == limit:
-                            #print('todos los tiempos')
                             count = 1  
                             uav['times'] = times
-                            print(uav)
                             drones.append(uav)
-                            #times.clear()
-        #print(drones) 
-    #print((drones[0]).get('cantidad'))
-    #for drone in drones: 
-        #print('botTime:',(drone.get('botTime')))  
-        #print('midTime:',(drone.get('midTime')))
-        #print('topTime:',(drone.get('topTime')))
-        #print('Tiempos:', drone.get('times')) 
     return drones
 leer()
 
