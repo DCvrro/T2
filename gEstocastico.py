@@ -1,6 +1,6 @@
-def leer():
+def leer(archivo):
     drones = []
-    with open('t2_Titan.txt','r+') as file:
+    with open(archivo,'r+') as file:
         count = 0
         uav = {}
         id = 1 
@@ -43,7 +43,6 @@ def leer():
                 count = 2
                 continue
                 
-
                 ###Ingreso los tiempos asociados a la cantidad y de cada uav.
             if(count == 2 ):
                 if 'times' in uav: ## Reviso si ya existe la seccion de registros de tiempos en el diccionario
@@ -57,41 +56,23 @@ def leer():
                             uav['times'] = times
                             drones.append(uav)
     return drones
-leer()
 
-def gDeterminista(uavs):
-    nTimes = []
-    uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False)
-    print('\n Uavs ordenados por tiempo preferente')
-    show_uavs(uavs_orden)
-    #print(uavs_orden)
-
-def gEstocastico():
+def gEstocastico(uavs):
     print("")  
 
-def HillClimbing():
-    print("")
-
-#Mostrar uavs, me dio paja copiar y pegar todo el rato el for para imprimirlos.
-def show_uavs(uavs):
-    b = True
-    large = len(uavs) 
-    for uav in uavs: 
-        if b :
-            print("UAVs :", large  ) 
-            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime'))
-            b = False
-        else:
-            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime')) 
-
 if __name__ == '__main__':
-    uavs = leer()
-    b = True
-    large = len(uavs)
-
-    show_uavs(uavs)
-    
-    gDeterminista(uavs)
-    ### Para el primer greedy se recomienda ordenar los uavs sgn el tipo de tiempo que se prefiera, creo que el mejor
-    #puede ser ordenar por el tiempo  preferente.
-    
+    print('Archivo a leer para aplicar Greedy Determinista \n 1.- t2_Deimos.txt \n 2.- t2_Europa.txt \n 3.- t2_Titan.txt')
+    choose = input()
+    match choose:
+        case '1':
+            archivo = 't2_Deimos.txt'
+            uavs = leer(archivo) 
+            gEstocastico(uavs)
+        case '2':
+            archivo = 't2_Europa.txt'
+            uavs = leer(archivo) 
+            gEstocastico(uavs)
+        case '3':
+            archivo = 't2_Titan.txt'
+            uavs = leer(archivo) 
+            gEstocastico(uavs)
