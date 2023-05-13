@@ -26,19 +26,20 @@ def leer():
                 ### Ingreso informacion de tiempos
             if count == 1 and len(lines) == 3:
                 uav = {
-                    'id': id,
+                    'id_uav': id,
                     'botTime':0,
                     'midTime':0,
                     'topTime':0,
                     'times':[]
                 }
-                id = id + 1
                 times = []
+                uav['id_uav'] = id
                 uav['botTime'] = int(lines[0])
                 uav['midTime'] = int(lines[1])
                 uav['topTime'] = int(lines[-1])
                 uav['times'] = times
-                
+
+                id = id + 1
                 count = 2
                 continue
                 
@@ -60,6 +61,10 @@ leer()
 
 def gDeterminista(uavs):
     nTimes = []
+    uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False)
+    print('\n Uavs ordenados por tiempo preferente')
+    show_uavs(uavs_orden)
+    #print(uavs_orden)
 
 def gEstocastico():
     print("")  
@@ -67,17 +72,26 @@ def gEstocastico():
 def HillClimbing():
     print("")
 
-if __name__ == '__main__':
-    uavs = leer()
+#Mostrar uavs, me dio paja copiar y pegar todo el rato el for para imprimirlos.
+def show_uavs(uavs):
     b = True
     large = len(uavs) 
     for uav in uavs: 
         if b :
             print("UAVs :", large  ) 
+            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime'))
             b = False
         else:
-            print(' ID :',uav.get('id')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime')) 
+            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime')) 
 
+if __name__ == '__main__':
+    uavs = leer()
+    b = True
+    large = len(uavs)
+
+    show_uavs(uavs)
+    
+    gDeterminista(uavs)
     ### Para el primer greedy se recomienda ordenar los uavs sgn el tipo de tiempo que se prefiera, creo que el mejor
     #puede ser ordenar por el tiempo  preferente.
     
