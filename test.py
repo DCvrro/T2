@@ -1,6 +1,6 @@
 def leer():
     drones = []
-    with open('t2_Europa.txt','r+') as file:
+    with open('t2_Titan.txt','r+') as file:
         count = 0
         uav = {}
         tiempos = []
@@ -55,6 +55,23 @@ def leer():
     return drones
 leer()
 
+def gDeterminista(uavs):
+    nTimes = []
+
+def gEstocastico():
+    print("")  
+
+def HillClimbing():
+    print("")
+
 if __name__ == '__main__':
-    a = leer()
-    print(a)
+    uavs = leer()
+    b = True
+    large = len(uavs) 
+    for uav in uavs: 
+        if b :
+            print("UAVs :", large  ) 
+            b = False
+        else:
+            print('Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime')) 
+    
