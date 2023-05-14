@@ -68,9 +68,9 @@ def gEstocastico(uavs):
     uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #Esto podria cambiarse a que tmbn sea aleatorio
     print('\n Uavs ordenados por tiempo preferente')                           #aleatorizar el hecho de trabajar cm por mid o bot time
     print('\n')
-
-    nR  =  random.randint(0,len(uavs_orden)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
     while((len(uavs)) != 0):
+        nR  =  random.randint(0,len(uavs_orden)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
+        #print('Toco el siguiente numero aleatorio: ',nR)
         uav = uavs_orden[nR]
         if uav['id_uav'] != uav_ant_id:
             if uav['botTime'] > cost:
@@ -79,7 +79,6 @@ def gEstocastico(uavs):
             uavs_orden.remove(uav)
             uavs.remove(uav)
             uav_ant_id = uav['id_uav']
-            print(uav)
             print("")
         #falta un condicional que permita asegurar que los rangos del random se cumplan
             if len(uavs_orden) > 0:
@@ -87,7 +86,11 @@ def gEstocastico(uavs):
         else: 
             nR  =  random.randint(0,len(uavs_orden)-1)
             continue
+        show_uavs_info(uav,cost)
     print('Costo total: ',cost)
+
+def show_uavs_info(uav,cost): 
+    print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
 def show_uavs(uavs):
     b = True
