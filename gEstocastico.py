@@ -1,3 +1,5 @@
+import random
+
 def leer(archivo):
     drones = []
     with open(archivo,'r+') as file:
@@ -57,8 +59,53 @@ def leer(archivo):
                             drones.append(uav)
     return drones
 
+
+
 def gEstocastico(uavs):
-    print("")  
+    ##Vamos a generar una lista con los ids de cada uav para despues acceder de forma aleatoria a ellos mediante el greedy estocastico.
+    cost = 0
+    uav_ant_id = 0
+    uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #Esto podria cambiarse a que tmbn sea aleatorio
+    print('\n Uavs ordenados por tiempo preferente')                           #aleatorizar el hecho de trabajar cm por mid o bot time
+    print('\n')
+
+    nR  =  random.randint(0,len(uavs_orden)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
+    while((len(uavs)) != 0):
+        uav = uavs_orden[nR]
+        if uav['id_uav'] != uav_ant_id:
+            if uav['botTime'] > cost:
+                cost = uav['botTime']
+            cost = cost + uav['midTime']
+            uavs_orden.remove(uav)
+            uavs.remove(uav)
+            uav_ant_id = uav['id_uav']
+            print(uav)
+            print("")
+        #falta un condicional que permita asegurar que los rangos del random se cumplan
+            if len(uavs_orden) > 0:
+                nR  =  random.randint(0,len(uavs_orden)-1)
+        else: 
+            nR  =  random.randint(0,len(uavs_orden)-1)
+            continue
+    print('Costo total: ',cost)
+
+def show_uavs(uavs):
+    b = True
+    large = len(uavs) 
+    for uav in uavs: 
+        if b :
+            print("UAVs :", large  ) 
+            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime'),'|', uav.get('times'))
+            b = False
+        else:
+            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime'),'|', uav.get('times')) 
+
+
+
+def printUAVs(uavs):
+    for uav in uavs:
+        print(uav)
+        print("")
 
 if __name__ == '__main__':
     print('Archivo a leer para aplicar Greedy Determinista \n 1.- t2_Deimos.txt \n 2.- t2_Europa.txt \n 3.- t2_Titan.txt')
@@ -66,13 +113,16 @@ if __name__ == '__main__':
     match choose:
         case '1':
             archivo = 't2_Deimos.txt'
-            uavs = leer(archivo) 
+            uavs = leer(archivo)
+            #printUAVs(uavs)
             gEstocastico(uavs)
         case '2':
             archivo = 't2_Europa.txt'
             uavs = leer(archivo) 
+            #printUAVs(uavs)
             gEstocastico(uavs)
         case '3':
             archivo = 't2_Titan.txt'
             uavs = leer(archivo) 
+            #printUAVs(uavs)
             gEstocastico(uavs)
