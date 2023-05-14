@@ -1,3 +1,5 @@
+import random
+
 def leer(archivo):
     drones = []
     with open(archivo,'r+') as file:
@@ -57,8 +59,49 @@ def leer(archivo):
                             drones.append(uav)
     return drones
 
-def HillClimbing(uavs):
-    print("")
+def gDeterminista(uavs):
+    cost = 0
+    uav_ant_id = 0
+    uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #UAVs ordenados de menor a mayor por medio del tiempo preferente
+    
+    for index, uav in enumerate(uavs_orden):
+        if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
+            uav['tiempo_aterrizaje'] = uav['midTime']
+            cost = cost + 0
+            uav_ant_id = uav['id_uav']
+        else:
+            tiempo_aterrizaje = uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]      #uav['midTime'] + uavs_orden[index-1]['times'][index]
+            if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
+                uav['tiempo_aterrizaje'] = tiempo_aterrizaje
+                cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
+                uav_ant_id = uav['id_uav']
+            else:
+                tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje'] - uav['botTime']) #uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]
+                uav['tiempo_aterrizaje'] = uav['botTime']
+                cost = cost + tiempo_aterrizaje
+    return uavs_orden
+
+def Hill_Climbing(initial_state, generate_neighbors, evaluate_state):
+    current_state = initial_state
+    
+    while True:
+        neighbors = generate_neighbors(current_state)
+        best_neighbor = None
+        best_score = evaluate_state(current_state)
+        
+        for neighbor in neighbors:
+            neighbor_score = evaluate_state(neighbor)
+            
+            if neighbor_score > best_score:
+                best_neighbor = neighbor
+                best_score = neighbor_score
+        
+        if best_neighbor is None:
+            break
+        
+        current_state = best_neighbor
+    
+    return current_state
 
 if __name__ == '__main__':
     print('Archivo a leer para aplicar HillClimbing en base al resultado del Greedy \n 1.- t2_Deimos.txt \n 2.- t2_Europa.txt \n 3.- t2_Titan.txt')
@@ -74,5 +117,6 @@ if __name__ == '__main__':
             #HillClimbing(uavs)
         case '3':
             archivo = 't2_Titan.txt'
-            #uavs = leer(archivo) 
-            #HillClimbing(uavs)
+            uavs = leer(archivo) 
+            print(gDeterminista(uavs))
+            Hill_Climbing(uavs)

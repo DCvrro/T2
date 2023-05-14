@@ -115,17 +115,20 @@ if __name__ == '__main__':
     choose = input()
     match choose:
         case '1':
-            archivo = 't2_Deimos.txt'
-            uavs = leer(archivo)
-            #printUAVs(uavs)
-            gEstocastico(uavs)
+            for i in range(0,5):
+                archivo = 't2_Deimos.txt'
+                uavs = leer(archivo)
+                #printUAVs(uavs)
+                gEstocastico(uavs)
         case '2':
-            archivo = 't2_Europa.txt'
-            uavs = leer(archivo) 
-            #printUAVs(uavs)
-            gEstocastico(uavs)
+            for i in range(0,5):
+                archivo = 't2_Europa.txt'
+                uavs = leer(archivo) 
+                #printUAVs(uavs)
+                gEstocastico(uavs)
         case '3':
-            archivo = 't2_Titan.txt'
-            uavs = leer(archivo) 
-            #printUAVs(uavs)
-            gEstocastico(uavs)
+            for i in range(0,5):
+                archivo = 't2_Titan.txt'
+                uavs = leer(archivo) 
+                #printUAVs(uavs)
+                gEstocastico(uavs)
