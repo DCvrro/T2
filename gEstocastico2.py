@@ -72,8 +72,17 @@ def gEstocastico(uavs):
     for uav in uavs: 
         midTime.append(uav['midTime'])
         midTimeTotal = midTimeTotal + uav['midTime']
+
+    premium = False
+    premiumID = 0
+    for uav in uavs: 
+        if uav['midTime'] == 0 or uav['topTime'] == 0 or uav['botTime'] == 0: 
+            premium = True
+            premiumID = uav['id_uav']
+            break
     while((len(uavs)) != 0):
-        if i == 0: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
+
+        if i == 0 and premium == False: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
             nR  =  random.randint(0,len(uavs)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
             this_uav = uavs[nR]
             this_uav['tiempo_aterrizaje'] = this_uav['midTime']
@@ -81,6 +90,18 @@ def gEstocastico(uavs):
             (show_uavs_info(this_uav,cost))
             uavs.remove(this_uav)
             i =  1 
+            #Calculamos las probabilidades de cada uav segun midtime/ midtimetotal
+            probUavs = []
+            for uav in uavs:
+                probUavs.append(uav['midTime']/midTimeTotal)
+            continue
+        elif i == 0 and premium == True:
+            this_uav = uavs[premiumID-1]
+            this_uav['tiempo_aterrizaje'] = this_uav['midTime']
+            uav_ant = this_uav
+            (show_uavs_info(this_uav,cost))
+            uavs.remove(this_uav)
+            i =  1
             #Calculamos las probabilidades de cada uav segun midtime/ midtimetotal
             probUavs = []
             for uav in uavs:
@@ -113,6 +134,8 @@ def gEstocastico(uavs):
                 probUavs = [] # Reinicio la probabilidad de los uavs.
                 for uav in uavs:
                     probUavs.append(uav['midTime']/midTimeTotal)
+            i = i + 1 
+    print("Se leyeron ",i, " uavs")
 
             
 
