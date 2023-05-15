@@ -71,6 +71,7 @@ def gEstocastico(uavs):
     tmpAterrizaje = 0
     i = 0 
     j = 0
+    rdys = [] 
     while(j != cant ):
         j = 0
         while((len(uavs)) != 0):
@@ -79,7 +80,7 @@ def gEstocastico(uavs):
             if i == 0: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
                 uav['tiempo_aterrizaje'] = uav['midTime']
                 uav_ant = uav
-                show_uavs_info(uav,cost)
+                rdys.append(show_uavs_info(uav,cost))
                 j = j + 1
                 uavs.remove(uav)
                 uavs_orden.remove(uav)
@@ -94,18 +95,23 @@ def gEstocastico(uavs):
                     cost = cost + abs(tmpAterrizaje - uav['midTime'])
                     uav_ant = uav
                     i = i + 1
-                    show_uavs_info(uav,cost) 
+                    rdys.append(show_uavs_info(uav,cost) )
                     j = j+ 1
-                else:
-                    if i == len(uavs)*10:
+                else: # condicion de seguridad para el equipo
+                    if i == len(uavs)*1000:
                         break
                     else:
                         i = i + 1
                         continue
         print('Parto con un nuevo ciclo')
+    printRdys(rdys)
 def show_uavs_info(uav,cost): 
-    print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
+    return (' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
+def printRdys(rdys):
+    print('Rdys :')
+    for rdy in rdys:
+        print(rdy)
 def show_uavs(uavs):
     b = True
     large = len(uavs) 
