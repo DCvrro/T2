@@ -67,35 +67,42 @@ def gEstocastico(uavs):
     uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #Esto podria cambiarse a que tmbn sea aleatorio
     print('\n Uavs ordenados por tiempo preferente')                           #aleatorizar el hecho de trabajar cm por mid o bot time
     print('\n')
+    cant = len(uavs)
     tmpAterrizaje = 0
     i = 0 
-    while((len(uavs)) != 0):
-        nR  =  random.randint(0,len(uavs_orden)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
-        uav = uavs_orden[nR]
-        if i == 0: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
-            uav['tiempo_aterrizaje'] = uav['midTime']
-            uav_ant = uav
-            show_uavs_info(uav,cost)
-            uavs.remove(uav)
-            uavs_orden.remove(uav)
-            i = i + 1 
-            continue
-        else:
-            tmpAterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]
-            if(tmpAterrizaje <= uav['topTime'] and tmpAterrizaje >= uav['botTime']):
-                uav['tiempo_aterrizaje'] = tmpAterrizaje
+    j = 0
+    while(j != cant ):
+        j = 0
+        while((len(uavs)) != 0):
+            nR  =  random.randint(0,len(uavs_orden)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
+            uav = uavs_orden[nR]
+            if i == 0: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
+                uav['tiempo_aterrizaje'] = uav['midTime']
+                uav_ant = uav
+                show_uavs_info(uav,cost)
+                j = j + 1
                 uavs.remove(uav)
                 uavs_orden.remove(uav)
-                cost = cost + abs(tmpAterrizaje - uav['midTime'])
-                uav_ant = uav
-                i = i + 1
-                show_uavs_info(uav,cost)
+                i = i + 1 
+                continue
             else:
-                if i == 100:
-                    break
-                else:
+                tmpAterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]
+                if(tmpAterrizaje <= uav['topTime'] and tmpAterrizaje >= uav['botTime']):
+                    uav['tiempo_aterrizaje'] = tmpAterrizaje
+                    uavs.remove(uav)
+                    uavs_orden.remove(uav)
+                    cost = cost + abs(tmpAterrizaje - uav['midTime'])
+                    uav_ant = uav
                     i = i + 1
-                    continue
+                    show_uavs_info(uav,cost) 
+                    j = j+ 1
+                else:
+                    if i == len(uavs)*10:
+                        break
+                    else:
+                        i = i + 1
+                        continue
+        print('Parto con un nuevo ciclo')
 def show_uavs_info(uav,cost): 
     print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
