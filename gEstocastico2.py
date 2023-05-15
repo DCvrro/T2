@@ -64,7 +64,6 @@ def leer(archivo):
 def gEstocastico(uavs):
     ##Vamos a generar una lista con los ids de cada uav para despues acceder de forma aleatoria a ellos mediante el greedy estocastico.
     cost = 0
-    uav_ant_id = 0
     uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #Esto podria cambiarse a que tmbn sea aleatorio
     print('\n Uavs ordenados por tiempo preferente')                           #aleatorizar el hecho de trabajar cm por mid o bot time
     print('\n')
@@ -85,14 +84,18 @@ def gEstocastico(uavs):
             tmpAterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]
             if(tmpAterrizaje <= uav['topTime'] and tmpAterrizaje >= uav['botTime']):
                 uav['tiempo_aterrizaje'] = tmpAterrizaje
-                show_uavs_info(uav,cost)
                 uavs.remove(uav)
                 uavs_orden.remove(uav)
                 cost = cost + abs(tmpAterrizaje - uav['midTime'])
                 uav_ant = uav
                 i = i + 1
-            if i > 20:
-                break
+                show_uavs_info(uav,cost)
+            else:
+                if i == 100:
+                    break
+                else:
+                    i = i + 1
+                    continue
 def show_uavs_info(uav,cost): 
     print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
