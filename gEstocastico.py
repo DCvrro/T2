@@ -64,34 +64,50 @@ def leer(archivo):
 def gEstocastico(uavs):
     ##Vamos a generar una lista con los ids de cada uav para despues acceder de forma aleatoria a ellos mediante el greedy estocastico.
     cost = 0
-    uav_ant_id = 0
     uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #Esto podria cambiarse a que tmbn sea aleatorio
     print('\n Uavs ordenados por tiempo preferente')                           #aleatorizar el hecho de trabajar cm por mid o bot time
     print('\n')
+    cant = len(uavs)
+    tmpAterrizaje = 0
+    i = 0 
+    j = 0
     while((len(uavs)) != 0):
         nR  =  random.randint(0,len(uavs_orden)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
-        #print('Toco el siguiente numero aleatorio: ',nR)
         uav = uavs_orden[nR]
-        if uav['id_uav'] != uav_ant_id:
-            if uav['botTime'] > cost:
-                cost = uav['botTime']
-            cost = cost + uav['midTime']
-            uavs_orden.remove(uav)
+        ProbUavs = []
+        if i == 0: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
+            uav['tiempo_aterrizaje'] = uav['midTime']
+            uav_ant = uav
+            (show_uavs_info(uav,cost))
+            j = j + 1
             uavs.remove(uav)
-            uav_ant_id = uav['id_uav']
-            print("")
-        #falta un condicional que permita asegurar que los rangos del random se cumplan
-            if len(uavs_orden) > 0:
-                nR  =  random.randint(0,len(uavs_orden)-1)
-        else: 
-            nR  =  random.randint(0,len(uavs_orden)-1)
+            uavs_orden.remove(uav)
+            i = i + 1 
             continue
-        show_uavs_info(uav,cost)
-    print('Costo total: ',cost)
-
+        else:
+            tmpAterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]
+            if(tmpAterrizaje <= uav['topTime'] and tmpAterrizaje >= uav['botTime']):
+                uav['tiempo_aterrizaje'] = tmpAterrizaje
+                uavs.remove(uav)
+                uavs_orden.remove(uav)
+                cost = cost + abs(tmpAterrizaje - uav['midTime'])
+                uav_ant = uav
+                i = i + 1
+                (show_uavs_info(uav,cost) )
+                j = j+ 1
+            else: # condicion de seguridad para el equipo
+                if i == len(uavs)*100000:
+                    break
+                else:
+                    i = i + 1
+                    continue
 def show_uavs_info(uav,cost): 
     print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
+def printRdys(rdys):
+    print('Rdys :')
+    for rdy in rdys:
+        print(rdy)
 def show_uavs(uavs):
     b = True
     large = len(uavs) 
@@ -115,20 +131,17 @@ if __name__ == '__main__':
     choose = input()
     match choose:
         case '1':
-            for i in range(0,5):
-                archivo = 't2_Deimos.txt'
-                uavs = leer(archivo)
-                #printUAVs(uavs)
-                gEstocastico(uavs)
+            archivo = 't2_Deimos.txt'
+            uavs = leer(archivo)
+            #printUAVs(uavs)
+            gEstocastico(uavs)
         case '2':
-            for i in range(0,5):
-                archivo = 't2_Europa.txt'
-                uavs = leer(archivo) 
-                #printUAVs(uavs)
-                gEstocastico(uavs)
+            archivo = 't2_Europa.txt'
+            uavs = leer(archivo) 
+            #printUAVs(uavs)
+            gEstocastico(uavs)
         case '3':
-            for i in range(0,5):
-                archivo = 't2_Titan.txt'
-                uavs = leer(archivo) 
-                #printUAVs(uavs)
-                gEstocastico(uavs)
+            archivo = 't2_Titan.txt'
+            uavs = leer(archivo) 
+            #printUAVs(uavs)
+            gEstocastico(uavs)

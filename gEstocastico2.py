@@ -64,49 +64,65 @@ def leer(archivo):
 def gEstocastico(uavs):
     ##Vamos a generar una lista con los ids de cada uav para despues acceder de forma aleatoria a ellos mediante el greedy estocastico.
     cost = 0
-    uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #Esto podria cambiarse a que tmbn sea aleatorio
-    print('\n Uavs ordenados por tiempo preferente')                           #aleatorizar el hecho de trabajar cm por mid o bot time
-    print('\n')
     cant = len(uavs)
     tmpAterrizaje = 0
     i = 0 
     j = 0
-    rdys = [] 
-    while(j != cant ):
-        j = 0
-        while((len(uavs)) != 0):
-            nR  =  random.randint(0,len(uavs_orden)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
-            uav = uavs_orden[nR]
-            if i == 0: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
-                uav['tiempo_aterrizaje'] = uav['midTime']
-                uav_ant = uav
-                rdys.append(show_uavs_info(uav,cost))
-                j = j + 1
-                uavs.remove(uav)
-                uavs_orden.remove(uav)
-                i = i + 1 
-                continue
+    midTime = []
+    midTimeTotal = 0 
+    for uav in uavs: 
+        midTime.append(uav['midTime'])
+        midTimeTotal = midTimeTotal + uav['midTime']
+    
+
+    while((len(uavs)) != 0):
+        if i == 0: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
+            nR  =  random.randint(0,len(uavs)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
+            uav = uavs[nR]
+            uav['tiempo_aterrizaje'] = uav['midTime']
+            uav_ant = uav
+            (show_uavs_info(uav,cost))
+            uavs.remove(uav)
+            i = i + 1 
+            #Calculamos las probabilidades de cada uav segun midtime/ midtimetotal
+            probUavs = []
+            for uav in uavs:
+                probUavs.append(uav['midTime']/midTimeTotal)
+            continue
+        else:
+            nextMidtime= random.choices(uavs,probUavs)[0]
+            #ahora teniendo el midtime, sacamos el id del uav a escoger
+            for uav in uavs:
+                if uav['midTime'] == nextMidtime['midTime']:
+                    this_uav = uav
+                    break
+            tmpAterrizaje = uav_ant['tiempo_aterrizaje'] + this_uav['times'][uav_ant['id_uav']-1]
+            if(tmpAterrizaje <= this_uav['topTime'] and tmpAterrizaje >= this_uav['botTime']): # si esta dentro de los rangos, lo uso
+                this_uav['tiempo_aterrizaje'] = tmpAterrizaje
+                uavs.remove(this_uav) # Elimino el uav usado para no repetirlo
+                cost = cost + abs(tmpAterrizaje - this_uav['midTime']) # calculo los costos
+                uav_ant = this_uav # Guardo en una temporal la informacion de uav
+                (show_uavs_info(this_uav,cost) ) # muestro la informacion
+                probUavs = [] # Reinicio la probabilidad de los uavs.
+                for uav in uavs:
+                    probUavs.append(uav['midTime']/midTimeTotal)
             else:
-                tmpAterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]
-                if(tmpAterrizaje <= uav['topTime'] and tmpAterrizaje >= uav['botTime']):
-                    uav['tiempo_aterrizaje'] = tmpAterrizaje
-                    uavs.remove(uav)
-                    uavs_orden.remove(uav)
-                    cost = cost + abs(tmpAterrizaje - uav['midTime'])
-                    uav_ant = uav
-                    i = i + 1
-                    rdys.append(show_uavs_info(uav,cost) )
-                    j = j+ 1
-                else: # condicion de seguridad para el equipo
-                    if i == len(uavs)*1000:
-                        break
-                    else:
-                        i = i + 1
-                        continue
-        print('Parto con un nuevo ciclo')
-    printRdys(rdys)
+                uav_ant_id = uav_ant['id_uav']
+                print(uavs[uav_ant_id])
+                tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje']-this_uav['midTime'])
+                this_uav['tiempo_aterrizaje'] = this_uav['botTime']
+                cost = cost + tiempo_aterrizaje
+                uav_ant = this_uav
+                uavs.remove(this_uav)
+                show_uavs_info(this_uav,cost)
+                probUavs = [] # Reinicio la probabilidad de los uavs.
+                for uav in uavs:
+                    probUavs.append(uav['midTime']/midTimeTotal)
+
+            
+
 def show_uavs_info(uav,cost): 
-    return (' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
+    print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
 def printRdys(rdys):
     print('Rdys :')
