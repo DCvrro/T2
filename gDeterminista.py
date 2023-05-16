@@ -60,6 +60,7 @@ def leer(archivo):
 def gDeterminista(uavs):
     cost = 0
     uav_ant_id = 0
+    print(uavs)
     uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #UAVs ordenados de menor a mayor por medio del tiempo preferente
     print('\n Uavs ordenados por tiempo preferente')
     print('\n')
@@ -80,10 +81,11 @@ def gDeterminista(uavs):
                 print('\n UAV ',uav['id_uav'],' no puede aterrizar en un principio.')
                 print('......')
                 print('Se extiende su tiempo de aterrizaje para que pueda aterrizar.')
-                tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje'] - uav['botTime']) #uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]
+                tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1] - uav['midTime']) #uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]
                 uav['tiempo_aterrizaje'] = uav['botTime']
                 cost = cost + tiempo_aterrizaje
             show_uavs_determinista(uav,cost)
+    #print(uavs_orden)
     print('Costo Total: ',cost)
  
 def show_uavs_determinista(uav,cost): 
@@ -118,3 +120,4 @@ if __name__ == '__main__':
             archivo = 't2_Titan.txt'
             uavs = leer(archivo) 
             gDeterminista(uavs)
+            #show_uavs(uavs)

@@ -59,8 +59,6 @@ def leer(archivo):
                             drones.append(uav)
     return drones
 
-
-
 def gEstocastico(uavs):
     ##Vamos a generar una lista con los ids de cada uav para despues acceder de forma aleatoria a ellos mediante el greedy estocastico.
     cost = 0
@@ -81,9 +79,8 @@ def gEstocastico(uavs):
             premiumID = uav['id_uav']
             break
     while((len(uavs)) != 0):
-
         if i == 0 and premium == False: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
-            nR  =  random.randint(0,len(uavs)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
+            nR = random.randint(0,len(uavs)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
             this_uav = uavs[nR]
             this_uav['tiempo_aterrizaje'] = this_uav['midTime']
             uav_ant = this_uav
@@ -137,8 +134,6 @@ def gEstocastico(uavs):
             i = i + 1 
     print("Se leyeron ",i, " uavs")
 
-            
-
 def show_uavs_info(uav,cost): 
     print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
@@ -146,6 +141,7 @@ def printRdys(rdys):
     print('Rdys :')
     for rdy in rdys:
         print(rdy)
+
 def show_uavs(uavs):
     b = True
     large = len(uavs) 
@@ -156,8 +152,6 @@ def show_uavs(uavs):
             b = False
         else:
             print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime'),'|', uav.get('times')) 
-
-
 
 def printUAVs(uavs):
     for uav in uavs:
