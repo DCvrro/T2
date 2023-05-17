@@ -180,18 +180,29 @@ def gEstocastico(uavs):
 #            iteraciones += 1
 #
 #    return mejorCamino, mejorCosto  
+import itertools
+
 def Hill_Climbing(caminoDeterminista, costoDeterminista):
     mejorCamino = copy.deepcopy(caminoDeterminista)
     mejorCosto = costoDeterminista
 
-    vecinos = generar_todos_los_vecinos(mejorCamino)
+    while True:
+        vecinos = generar_todos_los_vecinos(mejorCamino)
+        mejorVecino = None
+        mejorCostoVecino = float('inf')
 
-    for vecino in vecinos:
-        costoVecino = calcular_costo(vecino)
+        for vecino in vecinos:
+            costoVecino = calcular_costo(vecino)
 
-        if costoVecino < mejorCosto:
-            mejorCamino = vecino
-            mejorCosto = costoVecino
+            if costoVecino < mejorCostoVecino:
+                mejorVecino = vecino
+                mejorCostoVecino = costoVecino
+
+        if mejorCostoVecino < mejorCosto:
+            mejorCamino = mejorVecino
+            mejorCosto = mejorCostoVecino
+        else:
+            break
 
     return mejorCamino, mejorCosto
 
