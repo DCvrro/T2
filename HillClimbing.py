@@ -161,73 +161,40 @@ def gEstocastico(uavs):
     return uav_result
 
 def evaluate_state(neighbor):
-    cost_propio = 0
-    cost_total = 0
-    #av_ant = None
     cost = 0
     uavs = neighbor.copy()
     
     for index, uav in enumerate(neighbor):
         if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
             uav['tiempo_aterrizaje'] = uav['midTime']
-            #print(uav['tiempo_aterrizaje'])
             uav_ant = uav
-            #show_uavs_determinista(uav,cost)
-            #print(uav)
-            #print(neighbor)
-            #print(uav_ant)
         else:
             tiempo_aterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]      #uav['midTime'] + uavs_orden[index-1]['times']
             if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
                 uav['tiempo_aterrizaje'] = tiempo_aterrizaje
-                #cost_propio = abs(tiempo_aterrizaje - uav['midTime'])
-                #cost_total = cost_total + cost_propio
                 cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
-                uav_ant_id = uav['id_uav']
+                uav_ant = uav
             else:
-                #tiempo_aterrizaje =  abs(uavs[uav_ant_id-1] + uav['times'][uav_ant['id_uav']-1] - uav['midTime']) #uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]
                 tiempo_aterrizaje =  abs(uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1] - uav['midTime'])
                 uav['tiempo_aterrizaje'] = uav['botTime']
-                #cost_propio = tiempo_aterrizaje
-                #cost_total = cost_total + cost_propio
                 cost = cost + tiempo_aterrizaje
-        #cost_propio = 0
-        #print('Hola ',neighbor)
-        #print(uav_ant)
+                uav_ant = uav
     return cost, neighbor
 
 def generate_neighbors(current_state, premium):
-    vecino = []
-    #n = len(current_state)
-    #for i in range(n - 1, 0, -7):
-    #    if premium == 0:
-    #        j = random.randint(0, i)
-    #        current_state[i], current_state[j] = current_state[j], current_state[i]
-    #    elif premium == 1:
-    #        j = random.randint(1, i)
-    #        current_state[i], current_state[j] = current_state[j], current_state[i]
-    #for i in range(n):
-    #    vecino.append(current_state[i])
-    #print('pene')
     if premium == 0:
         while True:
             p = random.randint(0,len(current_state)-1)
             k = random.randint(0,len(current_state)-1)
-            #print(p)
-            #print(k)
-            #print(type(current_state))
             if p != k:
                 current_state[p] , current_state[k] = current_state[k], current_state[p]
-                vecino.append(current_state)
                 break
     else:
-        #print('pene3')
         while True:
             p = random.randint(1,14)
             k = random.randint(1,14)
             if p != k:
                 current_state[p] , current_state[k] = current_state[k], current_state[p]
-                vecino.append(current_state)
                 break
     return current_state
 
@@ -298,9 +265,8 @@ def Hill_Climbing_mejor_mejora(sol_inicial):
     return best_neighbor, best_score
 
 def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial):
-    #print(sol_inicial)
+
     neighbor_score = costo_inicial
-    #neighbor_inicial_score, neighbor_inicial = evaluate_state(sol_inicial)
 
     neighbor = sol_inicial #Arreglo de dicc
 
@@ -308,7 +274,6 @@ def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial):
     a = 0
     best_neighbor = sol_inicial
     neighbor_visitados = []
-    igual = 0
 
     while True:
         if neighbor_score < best_score: #Como se alguna-mejora, la primera solución que mejore la solución actual
@@ -321,70 +286,23 @@ def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial):
             for nei in neighbor:
                 if 'tiempo_aterriza' in nei:
                     del nei['tiempo_aterrizaje']
-                    #neighbor_visitados.append(neighbor.copy())
-            
-        #print(neighbor)
-        for index, uav in enumerate(neighbor):
-            #print(uav['botTime'])
-            if uav['botTime'] == 0 and uav['midTime'] == 0 and uav['topTime'] == 0:
-                neighbor = generate_neighbors(neighbor,1)
-                if neighbor not in neighbor_visitados:
-                    neighbor_score, neighbor = evaluate_state(neighbor)
-                    neighbor_visitados.append(neighbor.copy())
-                    break
-                #if len(neighbor_visitados) > len(neighbor):
-                #    for a in range(int(len(neighbor_visitados)/len(neighbor))): # 0,2
-                #        for c in range(len(neighbor)): # 0,15
-                #            if a > 0:
-                #                if neighbor[c]['id_uav'] != neighbor_visitados[len(neighbor)*a+c]['id_uav']: # 45 - 45 
-                #                    neighbor_score, neighbor = evaluate_state(neighbor)
-                #                    break
-                #            else:
-                #               if neighbor[c]['id_uav'] != neighbor_visitados[c]['id_uav']: 
-                #                    neighbor_score, neighbor = evaluate_state(neighbor)
-                #                    break
-                #else:
-                #    for a in range(len(neighbor)):
-                #        if neighbor[a]['id_uav'] != neighbor_visitados[a]['id_uav']:
-                #            neighbor_score, neighbor = evaluate_state(neighbor)
-                #            break
-            else:
-                #print('hola')
-                neighbor = generate_neighbors(neighbor,0)
-                #print(neighbor)
-                if neighbor not in neighbor_visitados:
-                    #print('hola2')
-                    neighbor_score, neighbor = evaluate_state(neighbor)
-                    neighbor_visitados.append(neighbor.copy())
+        if a == 0:
+            neighbor_visitados.append(neighbor.copy())
 
-                #if len(neighbor_visitados) > len(neighbor):
-                #    for a in range(int(len(neighbor_visitados)/len(neighbor))): # 0,2
-                #        for c in range(len(neighbor)): # 0,15
-                #            if a > 0:
-                #                if neighbor[c]['id_uav'] != neighbor_visitados[len(neighbor)*a+c]['id_uav']: # 45 - 45 
-                #                    neighbor_score, neighbor = evaluate_state(neighbor)
-                #                    break
-                #            else:
-                #                if neighbor[c]['id_uav'] != neighbor_visitados[c]['id_uav']: 
-                #                    neighbor_score, neighbor = evaluate_state(neighbor)
-                #                    break
-                #else:
-                #    for a in range(len(neighbor)):
-                #        if neighbor[a]['id_uav'] != neighbor_visitados[a]['id_uav']:
-                #            neighbor_score, neighbor = evaluate_state(neighbor)
-                #            break
-            
-        print(len(neighbor_visitados))
-        if len(neighbor_visitados) == len(neighbor)*5:
+        if neighbor[0]['botTime'] == 0 and neighbor[0]['midTime'] == 0 and neighbor[0]['topTime'] == 0:
+            neighbor = generate_neighbors(neighbor,1)
+            if neighbor not in neighbor_visitados:
+                neighbor_score, neighbor = evaluate_state(neighbor)
+                neighbor_visitados.append(neighbor.copy())
+        else:
+            neighbor = generate_neighbors(neighbor,0)
+            if neighbor not in neighbor_visitados:
+                neighbor_score, neighbor = evaluate_state(neighbor)
+                neighbor_visitados.append(neighbor.copy())
+
+        if len(neighbor_visitados) == 1000:
             break
-            #if neighbor_inicial_score == best_score:
-            #    for a in range(len(best_neighbor)):
-            #        if best_neighbor[a]['id_uav'] == neighbor_inicial[a]['id_uav']:
-            #            igual = igual + 1
-        #if igual == len(best_neighbor):
-        #    best_neighbor = neighbor_inicial
-        #    best_score = neighbor_inicial_score
-        #    break
+
         a = a + 1
     return best_neighbor, best_score
 
