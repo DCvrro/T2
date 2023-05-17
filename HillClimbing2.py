@@ -162,28 +162,19 @@ def gEstocastico(uavs):
 
 def evaluate_state(neighbor):
     cost = 0
-    uavs = neighbor.copy()
-    
     for index, uav in enumerate(neighbor):
-        if 'tiempo_aterrizaje' in uav:
-            if uav['tiempo_aterrizaje'] <= uav['topTime'] and uav['tiempo_aterrizaje'] >= uav['botTime']:
-                cost = cost + abs(uav['tiempo_aterrizaje'] - uav['midTime'])
+        if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
+            uav['tiempo_aterrizaje'] = uav['midTime']
+            uav_ant = uav
+        else:
+            tiempo_aterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]      #uav['midTime'] + uavs_orden[index-1]['times']
+            if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
+                uav['tiempo_aterrizaje'] = tiempo_aterrizaje
+                cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
             else:
-                cost = cost + uav['tiempo_aterrizaje']
-            print("Aterrizaje",uav['tiempo_aterrizaje'],"Costo", cost) 
-        else: 
-            if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
-                uav['tiempo_aterrizaje'] = uav['midTime']
-                uav_ant = uav
-            else:
-                tiempo_aterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]      #uav['midTime'] + uavs_orden[index-1]['times']
-                if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
-                    uav['tiempo_aterrizaje'] = tiempo_aterrizaje
-                    cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
-                else:
-                    tiempo_aterrizaje =  abs(uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1] - uav['midTime'])
-                    uav['tiempo_aterrizaje'] = uav['botTime']
-                    cost = cost + tiempo_aterrizaje
+                tiempo_aterrizaje =  abs(uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1] - uav['midTime'])
+                uav['tiempo_aterrizaje'] = uav['botTime']
+                cost = cost + tiempo_aterrizaje
     return cost, neighbor
 
 def generate_neighbors(current_state, premium):
@@ -244,18 +235,33 @@ def generar_vecindario_completo(current_state,premium,limite_vecinos):
             else:
                 count = count + 1 
 
-    print('Costo inicial: ', costo_inicial)
-    #print('Solucion inicial: ', current_state)
-    print('Costo del mejor vecino: ', menor_costo)
-    #print('Mejor vecino: ', vecinos[-1])
-    return vecinos[-1] 
+    return count,vecinos[-1] 
 
-def Hill_Climbing_mejor_mejora(sol_inicial):
-    #print("Current_State:", sol_inicial)
-    costo, caminos = evaluate_state(sol_inicial)
-    print("Costo", costo) 
-    #generar_vecindario_completo(current_state,0,150)
+def Hill_Climbing_mejor_mejora(sol_inicial,costo_inicial):
+
+    tmpCostDeterminista , none = evaluate_state(sol_inicial)
+    totalVecinos, mejor_vecino = generar_vecindario_completo(sol_inicial,0,100)
+    costo_mejor_vecino , none = evaluate_state(mejor_vecino)
+    vari = abs(tmpCostDeterminista - costo_inicial)
+    print("Se revisó un total de ",totalVecinos,"vecinos, y el mejor vecino tiene un costo de :", costo_mejor_vecino - vari) 
     return 0 
+
+#ahora haremos un hillclimbingiterativo, el cual se volverá a llamar en cada posicion que uno se encuentre.
+def Hill_Climbing_iterativo(sol_inicial,nueva_solucion, costo_inicial,ubicacion_actual,revisados):
+    size = len(sol_inicial) # veo por cuantos uavs debo pasar
+    if(ubicacion_actual == len(sol_inicial)-1):
+        return nueva_solucion
+    else:
+        nueva_solucion,revisados = mejoro_vecino(nueva_solucion,ubicacion_actual,revisados)
+        Hill_Climbing_iterativo(sol_inicial,nueva_solucion,costo_inicial,ubicacion_actual+1,revisados)
+
+def mejoro_vecino(nueva_solucion,ubicacion_actual,revisados):
+    mejor_vecino = []
+    if ubicacion_actual in revisados:
+        return nueva_solucion,revisados
+
+
+
 
 def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial):
     neighbor_score = costo_inicial
@@ -322,17 +328,12 @@ if __name__ == '__main__':
             archivo = 't2_Europa.txt'
             uavs = leer(archivo)
             uavs_original = leer(archivo)
-            b, costo_inicial = gDeterminista(uavs)
-            sol_inicial_indexs = []
-            sol_inicial_data = []
-            for i in b:
-                sol_inicial_indexs.append(i['id_uav'])
-            for a in sol_inicial_indexs:
-                for c in uavs_original:
-                    if a == c['id_uav']:
-                        sol_inicial_data.append(c)
-            mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial) #Envía los ids de los uavs resultados del greedy.
-            print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
+            sol_inicial_data, costo_inicial = gDeterminista(uavs)
+            print("Costo Determinista:", costo_inicial) 
+            #print("Primera solucion:",sol_inicial_data)
+            Hill_Climbing_mejor_mejora(sol_inicial_data,costo_inicial) #Envía los ids de los uavs resultados del greedy.
+            #print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
+
         case '3': #En este caso la mejor solución es el greedy determinista
             archivo = 't2_Titan.txt'
             uavs = leer(archivo)
@@ -340,5 +341,5 @@ if __name__ == '__main__':
             sol_inicial_data, costo_inicial = gDeterminista(uavs)
             print("Costo Determinista:", costo_inicial) 
             #print("Primera solucion:",sol_inicial_data)
-            Hill_Climbing_mejor_mejora(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
+            Hill_Climbing_mejor_mejora(sol_inicial_data,costo_inicial) #Envía los ids de los uavs resultados del greedy.
             #print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)

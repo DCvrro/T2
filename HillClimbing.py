@@ -1,4 +1,5 @@
 import random
+import copy
 
 def leer(archivo):
     drones = []
@@ -163,23 +164,29 @@ def gEstocastico(uavs):
 def evaluate_state(neighbor):
     cost = 0
     uavs = neighbor.copy()
-    
-    for index, uav in enumerate(neighbor):
+    #print(uavs)
+    for index, uav in enumerate(uavs):
         if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
             uav['tiempo_aterrizaje'] = uav['midTime']
+            #print(uav)
             uav_ant = uav
+            #print(uav_ant)
         else:
+            #print(uav_ant)
             tiempo_aterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]      #uav['midTime'] + uavs_orden[index-1]['times']
             if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
                 uav['tiempo_aterrizaje'] = tiempo_aterrizaje
                 cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
-                uav_ant = uav
-            else:
+                
+            elif tiempo_aterrizaje > uav['topTime'] or tiempo_aterrizaje < uav['botTime']:
                 tiempo_aterrizaje =  abs(uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1] - uav['midTime'])
                 uav['tiempo_aterrizaje'] = uav['botTime']
                 cost = cost + tiempo_aterrizaje
-                uav_ant = uav
-    return cost, neighbor
+                #uav_ant = uav
+            #print(uav,cost)
+            uav_ant = uav
+        #print(index)
+    return cost, uavs
 
 def generate_neighbors(current_state, premium):
     if premium == 0:
@@ -198,50 +205,55 @@ def generate_neighbors(current_state, premium):
                 break
     return current_state
 
-def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial):
-    neighbor_actual = sol_inicial.copy()
+def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial, max_iter):
+    sol_inicial_aux = copy.deepcopy(sol_inicial)
+    neighbor_ant = sol_inicial
+    best_score = copy.deepcopy(costo_inicial)
+    best_neighbor = [sol_inicial]
+    for nei in neighbor_ant:
+        if 'tiempo_aterrizaje' in nei:
+            del nei['tiempo_aterrizaje']
+    neighbor_actual = sol_inicial
     neighbor_score_actual = costo_inicial
-    
-    best_score = costo_inicial
-    best_neighbor = sol_inicial.copy()
-    
     a = 0
-    enontrte = 0
-    neighbor_visitados = []
+    igual_score = 0
+    distinta = 0
 
     while True:
         if neighbor_score_actual < best_score: #Como se alguna-mejora, la primera solución que mejore la solución actual
-            best_score = neighbor_score_actual
-            best_neighbor = neighbor_actual.copy()
+            best_score = copy.deepcopy(neighbor_score_actual)
+            best_neighbor.pop()
+            best_neighbor.append(copy.deepcopy(neighbor_actual))
             print('\n Solución Mejor del Alguna-Mejora encontrada con costo: ', best_score )
-        #else:
-            #print('Vecino no mejor')
-        if a != 0:
+            print(best_neighbor)
+            neighbor_ant = neighbor_actual
+            neighbor_actual = None
+            distinta = distinta + 1
+        elif neighbor_score_actual == best_score and neighbor_actual != best_neighbor:
+            igual_score = igual_score + 1 
+        else:
+            neighbor_actual = neighbor_ant
             for nei in neighbor_actual:
                 if 'tiempo_aterriza' in nei:
                     del nei['tiempo_aterrizaje']
-        if a == 0:
-            neighbor_visitados.append(sol_inicial.copy())
+        if neighbor_actual != neighbor_ant:
+            for nei in neighbor_ant:
+                if 'tiempo_aterriza' in nei:
+                    del nei['tiempo_aterrizaje']
 
-        if neighbor_actual[0]['botTime'] == 0 and neighbor_actual[0]['midTime'] == 0 and neighbor_actual[0]['topTime'] == 0:
-            neighbor_actual = generate_neighbors(neighbor_actual,1)
-            if neighbor_actual not in neighbor_visitados:
-                neighbor_visitados.append(neighbor_actual.copy())
-                neighbor_score_actual, neighbor_actual = evaluate_state(neighbor_actual)
-                
+        if neighbor_ant[0]['botTime'] == 0 and neighbor_ant[0]['midTime'] == 0 and neighbor_ant[0]['topTime'] == 0:
+            neighbor_actual = generate_neighbors(neighbor_ant,1)
+            neighbor_score_actual, neighbor_actual = evaluate_state(neighbor_actual)
         else:
-            neighbor_actual = generate_neighbors(neighbor_actual,0)
-            if neighbor_actual not in neighbor_visitados:
-                neighbor_visitados.append(neighbor_actual.copy())
-                neighbor_score_actual, neighbor_actual = evaluate_state(neighbor_actual)
-
-        if len(neighbor_visitados) == 10000:
-            break
-
+            neighbor_actual = generate_neighbors(neighbor_ant,0)
+            neighbor_score_actual, neighbor_actual = evaluate_state(neighbor_actual)
+        if max_iter-1 == a and igual_score != 0 and distinta == 0:
+            print('Sol inicial ya que ninguna fue mejor, pero otras daban lo mismo')
+            return sol_inicial_aux, costo_inicial
+        elif max_iter-1 == a and distinta != 0:
+            print('Sol mejor distinta')
+            return best_neighbor, best_score
         a = a + 1
-
-    return best_neighbor, best_score
-
 
 def Hill_Climbing_mejor_mejora(sol_inicial, costo_inicial):
     neighbor_score = costo_inicial
@@ -313,7 +325,9 @@ if __name__ == '__main__':
                         for c in uavs_original:
                             if a == c['id_uav']:
                                 sol_inicial_data.append(c)
-                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial) #Envía los ids de los uavs resultados del greedy.
+                    print(costo_inicial)
+                    #print('Hola ', sol_inicial_data)
+                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial, max_iter = 100) #Envía los ids de los uavs resultados del greedy.
                     print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
                 case '2':
                     for d in range(5):
@@ -355,7 +369,9 @@ if __name__ == '__main__':
                         for c in uavs_original:
                             if a == c['id_uav']:
                                 sol_inicial_data.append(c)
-                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial) #Envía los ids de los uavs resultados del greedy.
+                    print(costo_inicial)
+                    #print('Hola ', sol_inicial_data)
+                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial, max_iter = 100) #Envía los ids de los uavs resultados del greedy.
                     print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
                 case '2':
                     for d in range(5):
@@ -399,23 +415,16 @@ if __name__ == '__main__':
                         for c in uavs_original:
                             if a == c['id_uav']:
                                 sol_inicial_data.append(c)
-                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial) #Envía los ids de los uavs resultados del greedy.
+                    print(costo_inicial)
+                    #print('Hola ', sol_inicial_data)
+                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial, max_iter = 1000) #Envía los ids de los uavs resultados del greedy.
                     print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
                 case '2':
                     for d in range(5):
                         uavs = leer(archivo)
                         uavs_original = uavs.copy()
                         b,costo_inicial = gEstocastico(uavs)
-                        sol_inicial_indexs = []
-                        sol_inicial_data = []
-                        for i in b:
-                            sol_inicial_indexs.append(i['id_uav'])
-                        for a in sol_inicial_indexs:
-                            for c in uavs_original:
-                                if a == c['id_uav']:
-                                    sol_inicial_data.append(c)
-                        #print(costo_inicial)
-                        mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial) #Envía los ids de los uavs resultados del greedy.
+                        mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(b, costo_inicial,max_iter=1000) #Envía los ids de los uavs resultados del greedy.
                         print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
                 case '3':
                     #MEJOR MEJORA DETERMINISTA
