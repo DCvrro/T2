@@ -235,15 +235,17 @@ def generar_vecindario_completo(current_state,premium,limite_vecinos):
             else:
                 count = count + 1 
 
-    return count,vecinos[-1] 
+    print('Costo inicial: ', costo_inicial)
+    #print('Solucion inicial: ', current_state)
+    print('Costo del mejor vecino: ', menor_costo)
+    #print('Mejor vecino: ', vecinos[-1])
+    return vecinos[-1] 
 
-def Hill_Climbing_mejor_mejora(sol_inicial,costo_inicial):
-
-    tmpCostDeterminista , none = evaluate_state(sol_inicial)
-    totalVecinos, mejor_vecino = generar_vecindario_completo(sol_inicial,0,100)
-    costo_mejor_vecino , none = evaluate_state(mejor_vecino)
-    vari = abs(tmpCostDeterminista - costo_inicial)
-    print("Se revisó un total de ",totalVecinos,"vecinos, y el mejor vecino tiene un costo de :", costo_mejor_vecino - vari) 
+def Hill_Climbing_mejor_mejora(sol_inicial):
+    #print("Current_State:", sol_inicial)
+    costo, caminos = evaluate_state(sol_inicial)
+    print("Costo", costo) 
+    #generar_vecindario_completo(current_state,0,150)
     return 0 
 
 #ahora haremos un hillclimbingiterativo, el cual se volverá a llamar en cada posicion que uno se encuentre.
