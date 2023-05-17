@@ -161,60 +161,85 @@ def gEstocastico(uavs):
     print("Se leyeron ",i, " uavs")
     return uav_result, cost
 
+#def Hill_Climbing(caminoDeterminista, costoDeterminista):
+#    mejorCamino = copy.deepcopy(caminoDeterminista)
+#    mejorCosto = costoDeterminista
+#
+#    iteraciones = 0
+#    max_iteraciones = 1000
+#
+#    while iteraciones < max_iteraciones:
+#        vecino = generar_vecino(mejorCamino)
+#        costoVecino = calcular_costo(vecino)
+#
+#        if costoVecino < mejorCosto:
+#            mejorCamino = vecino
+#            mejorCosto = costoVecino
+#            iteraciones = 0
+#        else:
+#            iteraciones += 1
+#
+#    return mejorCamino, mejorCosto  
 def Hill_Climbing(caminoDeterminista, costoDeterminista):
     mejorCamino = copy.deepcopy(caminoDeterminista)
     mejorCosto = costoDeterminista
-    
-    while True:
-        vecinos = generarVecinos(mejorCamino)  # Genera los vecinos de la mejor solución actual
-        
-        encontradoMejorVecino = False
-        
-        for vecino in vecinos:
-            costoVecino = calcularCosto(vecino)
-            
-            if costoVecino < mejorCosto:
-                mejorCamino = vecino
-                mejorCosto = costoVecino
-                encontradoMejorVecino = True
-                break
-        
-        if not encontradoMejorVecino:
-            break
-    
-    print("Mejor solución encontrada:", mejorCamino)
-    print("Costo de la mejor solución:", mejorCosto)
 
-def generarVecinos(camino):
+    vecinos = generar_todos_los_vecinos(mejorCamino)
+
+    for vecino in vecinos:
+        costoVecino = calcular_costo(vecino)
+
+        if costoVecino < mejorCosto:
+            mejorCamino = vecino
+            mejorCosto = costoVecino
+
+    return mejorCamino, mejorCosto
+
+def generar_todos_los_vecinos(camino):
     vecinos = []
-    
+
     for i in range(len(camino)):
         for j in range(i + 1, len(camino)):
             vecino = copy.deepcopy(camino)
             vecino[i], vecino[j] = vecino[j], vecino[i]
             vecinos.append(vecino)
-    
+
     return vecinos
-def calcularCosto(solucion, uavs):
-    costo = 0
+
+def generar_vecino(camino):
+    vecino = copy.deepcopy(camino)
+    uav1 = random.randint(0, len(vecino) - 1)
+    uav2 = random.randint(0, len(vecino) - 1)
+
+    while uav1 == uav2:
+        uav2 = random.randint(0, len(vecino) - 1)
+
+    vecino[uav1], vecino[uav2] = vecino[uav2], vecino[uav1]
+
+    return vecino
+
+def calcular_costo(camino):
+    cost = 0
     uav_ant_id = 0
 
-    for index, uav in enumerate(solucion):
+    for index, uav in enumerate(camino):
         if index == 0:
             uav['tiempo_aterrizaje'] = uav['midTime']
+            cost = cost + 0
             uav_ant_id = uav['id_uav']
         else:
-            tiempo_aterrizaje = solucion[uav_ant_id - 1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id - 1]
+            tiempo_aterrizaje = camino[uav_ant_id - 1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id - 1]
             if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']:
                 uav['tiempo_aterrizaje'] = tiempo_aterrizaje
-                costo += abs(tiempo_aterrizaje - uav['midTime'])
+                cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
                 uav_ant_id = uav['id_uav']
             else:
-                tiempo_aterrizaje = abs(solucion[uav_ant_id - 1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id - 1] - uav['midTime'])
+                tiempo_aterrizaje = abs(camino[uav_ant_id - 1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id - 1] - uav['midTime'])
                 uav['tiempo_aterrizaje'] = uav['botTime']
-                costo += tiempo_aterrizaje
+                cost = cost + tiempo_aterrizaje
 
-    return costo
+    return cost
+
 
 if __name__ == '__main__':
     #hacemos un match para saber que texto escoger
@@ -227,7 +252,8 @@ if __name__ == '__main__':
         case '3':
             ar  = 't2_Titan.txt'
     
-            uavs = leer(ar)
-            caminoDeterminista, costoDeterminista = gDeterminista(uavs)
-            print("Costo Determinista:",costoDeterminista) 
-            Hill_Climbing(caminoDeterminista,costoDeterminista)
+    uavs = leer(ar)
+    caminoDeterminista, costoDeterminista = gDeterminista(uavs)
+    print("Costo Determinista:",costoDeterminista) 
+    mejorCamino, mejorCosto = Hill_Climbing(caminoDeterminista,costoDeterminista)
+    print ("Mejor Costo:", mejorCosto) 
