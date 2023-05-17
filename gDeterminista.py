@@ -86,6 +86,7 @@ def gDeterminista(uavs):
                 cost = cost + tiempo_aterrizaje
             show_uavs_determinista(uav,cost)
     #print(uavs_orden)
+
     print('Costo Total: ',cost)
  
 def show_uavs_determinista(uav,cost): 
