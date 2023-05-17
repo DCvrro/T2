@@ -79,7 +79,6 @@ def gDeterminista(uavs):
                 tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1] - uav['midTime']) #uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]
                 uav['tiempo_aterrizaje'] = uav['botTime']
                 cost = cost + tiempo_aterrizaje
-    return uavs_orden
     return uavs_orden, cost
 
 def gEstocastico(uavs):
@@ -166,19 +165,25 @@ def evaluate_state(neighbor):
     uavs = neighbor.copy()
     
     for index, uav in enumerate(neighbor):
-        if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
-            uav['tiempo_aterrizaje'] = uav['midTime']
-            uav_ant = uav
-        else:
-            tiempo_aterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]      #uav['midTime'] + uavs_orden[index-1]['times']
-            if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
-                uav['tiempo_aterrizaje'] = tiempo_aterrizaje
-                cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
-                uav_ant_id = uav['id_uav']
+        if 'tiempo_aterrizaje' in uav:
+            if uav['tiempo_aterrizaje'] <= uav['topTime'] and uav['tiempo_aterrizaje'] >= uav['botTime']:
+                cost = cost + abs(uav['tiempo_aterrizaje'] - uav['midTime'])
             else:
-                tiempo_aterrizaje =  abs(uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1] - uav['midTime'])
-                uav['tiempo_aterrizaje'] = uav['botTime']
-                cost = cost + tiempo_aterrizaje
+                cost = cost + uav['tiempo_aterrizaje']
+            print("Aterrizaje",uav['tiempo_aterrizaje'],"Costo", cost) 
+        else: 
+            if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
+                uav['tiempo_aterrizaje'] = uav['midTime']
+                uav_ant = uav
+            else:
+                tiempo_aterrizaje = uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1]      #uav['midTime'] + uavs_orden[index-1]['times']
+                if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
+                    uav['tiempo_aterrizaje'] = tiempo_aterrizaje
+                    cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
+                else:
+                    tiempo_aterrizaje =  abs(uav_ant['tiempo_aterrizaje'] + uav['times'][uav_ant['id_uav']-1] - uav['midTime'])
+                    uav['tiempo_aterrizaje'] = uav['botTime']
+                    cost = cost + tiempo_aterrizaje
     return cost, neighbor
 
 def generate_neighbors(current_state, premium):
@@ -245,13 +250,12 @@ def generar_vecindario_completo(current_state,premium,limite_vecinos):
     #print('Mejor vecino: ', vecinos[-1])
     return vecinos[-1] 
 
-def Hill_Climbing_mejor_mejora(current_state):
-    generar_vecindario_completo(current_state,0,150)
-    a = 0
-    #hacemos el recorrido para el mejor camino
-    while True:
-        if a!= 0:
-            
+def Hill_Climbing_mejor_mejora(sol_inicial):
+    #print("Current_State:", sol_inicial)
+    costo, caminos = evaluate_state(sol_inicial)
+    print("Costo", costo) 
+    #generar_vecindario_completo(current_state,0,150)
+    return 0 
 
 def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial):
     neighbor_score = costo_inicial
@@ -333,15 +337,8 @@ if __name__ == '__main__':
             archivo = 't2_Titan.txt'
             uavs = leer(archivo)
             uavs_original = leer(archivo)
-            b, costo_inicial = gDeterminista(uavs)
-            sol_inicial_indexs = []
-            sol_inicial_data = []
-            for i in b:
-                sol_inicial_indexs.append(i['id_uav'])
-            for a in sol_inicial_indexs:
-                for c in uavs_original:
-                    if a == c['id_uav']:
-                        sol_inicial_data.append(c)
-            #print(costo_inicial)
+            sol_inicial_data, costo_inicial = gDeterminista(uavs)
+            print("Costo Determinista:", costo_inicial) 
+            #print("Primera solucion:",sol_inicial_data)
             Hill_Climbing_mejor_mejora(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
             #print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)

@@ -60,10 +60,10 @@ def leer(archivo):
 def gDeterminista(uavs):
     cost = 0
     uav_ant_id = 0
-    print(uavs)
+    #print(uavs)
     uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #UAVs ordenados de menor a mayor por medio del tiempo preferente
-    print('\n Uavs ordenados por tiempo preferente')
-    print('\n')
+    #print('\n Uavs ordenados por tiempo preferente')
+    #print('\n')
     
     for index, uav in enumerate(uavs_orden):
         if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
@@ -78,8 +78,8 @@ def gDeterminista(uavs):
                 cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
                 uav_ant_id = uav['id_uav']
             else:
-                print('\n UAV ',uav['id_uav'],' no puede aterrizar en un principio.')
-                print('......')
+                #print('\n UAV ',uav['id_uav'],' no puede aterrizar en un principio.')
+                #print('......')
                 print('Se extiende su tiempo de aterrizaje para que pueda aterrizar.')
                 tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1] - uav['midTime']) #uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]
                 uav['tiempo_aterrizaje'] = uav['botTime']
