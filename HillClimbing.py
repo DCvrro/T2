@@ -193,7 +193,7 @@ def evaluate_state(neighbor):
     return cost, neighbor
 
 def generate_neighbors(current_state, premium):
-    vecino = []
+    vecino = {}
     n = len(current_state)
     for i in range(n - 1, 0, -7):
         if premium == 0:
@@ -204,10 +204,9 @@ def generate_neighbors(current_state, premium):
             current_state[i], current_state[j] = current_state[j], current_state[i]
     for i in range(n):
         vecino.append(current_state[i])
-    
     return vecino
 
-def Hill_Climbing(sol_inicial):
+def Hill_Climbing_mejor_mejora(sol_inicial):
     neighbor_score, neighbor = evaluate_state(sol_inicial)
     neighbor_inicial_score, neighbor_inicial = evaluate_state(sol_inicial)
     best_score = neighbor_score
@@ -221,7 +220,7 @@ def Hill_Climbing(sol_inicial):
             best_score = neighbor_score
             best_neighbor = neighbor
 
-        print('\n Solución: ', neighbor, 'con costo: ', neighbor_score)
+        #print('\n Solución: ', neighbor, 'con costo: ', neighbor_score)
 
         for nei in neighbor:
             del nei['tiempo_aterrizaje']
@@ -261,7 +260,7 @@ def Hill_Climbing(sol_inicial):
                         neighbor_score, neighbor = evaluate_state(neighbor)
                         break
 
-        if len(neighbor_visitados) == len(neighbor_inicial)*10:
+        if len(neighbor_visitados) == len(neighbor_inicial)*1:
             if neighbor_inicial_score == best_score:
                 for a in range(len(best_neighbor)):
                     if best_neighbor[a]['id_uav'] == neighbor_inicial[a]['id_uav']:
@@ -270,6 +269,77 @@ def Hill_Climbing(sol_inicial):
                 best_neighbor = neighbor_inicial
                 best_score = neighbor_inicial_score
                 break
+
+    return best_neighbor, best_score
+
+def Hill_Climbing_alguna_mejora(sol_inicial):
+    neighbor_score, neighbor = evaluate_state(sol_inicial)
+    neighbor_inicial_score, neighbor_inicial = evaluate_state(sol_inicial)
+    best_score = neighbor_score
+    a = 0
+    best_neighbor = neighbor
+    neighbor_visitados = []
+    igual = 0
+
+    while True:
+        if neighbor_score < best_score: #Como se alguna-mejora, la primera solución que mejore la solución actual
+            best_score = neighbor_score
+            best_neighbor = neighbor
+
+        print('\n Solución: ', neighbor, 'con costo: ', neighbor_score)
+
+        for nei in neighbor:
+            del nei['tiempo_aterrizaje']
+
+        neighbor_visitados.extend(neighbor)
+
+        if neighbor[0]['botTime'] == 0 and neighbor[0]['midTime'] == 0 and neighbor[0]['topTime'] == 0:
+            neighbor = generate_neighbors(neighbor,1)
+
+            if len(neighbor_visitados) > len(neighbor):
+                for a in range(int(len(neighbor_visitados)/len(neighbor))): # 0,2
+                    for c in range(len(neighbor)): # 0,15
+                        if a > 0:
+                            if neighbor[c]['id_uav'] != neighbor_visitados[len(neighbor)*a+c]['id_uav']: # 45 - 45 
+                                neighbor_score, neighbor = evaluate_state(neighbor)
+                                break
+                        else:
+                            if neighbor[c]['id_uav'] != neighbor_visitados[c]['id_uav']: 
+                                neighbor_score, neighbor = evaluate_state(neighbor)
+                                break
+            else:
+                for a in range(len(neighbor)):
+                    if neighbor[a]['id_uav'] != neighbor_visitados[a]['id_uav']:
+                        neighbor_score, neighbor = evaluate_state(neighbor)
+                        break
+        else:
+            neighbor = generate_neighbors(neighbor,0)
+            if len(neighbor_visitados) > len(neighbor):
+                for a in range(int(len(neighbor_visitados)/len(neighbor))): # 0,2
+                    for c in range(len(neighbor)): # 0,15
+                        if a > 0:
+                            if neighbor[c]['id_uav'] != neighbor_visitados[len(neighbor)*a+c]['id_uav']: # 45 - 45 
+                                neighbor_score, neighbor = evaluate_state(neighbor)
+                                break
+                        else:
+                            if neighbor[c]['id_uav'] != neighbor_visitados[c]['id_uav']: 
+                                neighbor_score, neighbor = evaluate_state(neighbor)
+                                break
+            else:
+                for a in range(len(neighbor)):
+                    if neighbor[a]['id_uav'] != neighbor_visitados[a]['id_uav']:
+                        neighbor_score, neighbor = evaluate_state(neighbor)
+                        break
+
+        if len(neighbor_visitados) == len(neighbor_inicial)*3:
+            if neighbor_inicial_score == best_score:
+                for a in range(len(best_neighbor)):
+                    if best_neighbor[a]['id_uav'] == neighbor_inicial[a]['id_uav']:
+                        igual = igual + 1
+        if igual == len(best_neighbor):
+            best_neighbor = neighbor_inicial
+            best_score = neighbor_inicial_score
+            break
 
     return best_neighbor, best_score
 
@@ -295,7 +365,7 @@ if __name__ == '__main__':
                     if a == c['id_uav']:
                         sol_inicial_data.append(c)
             print(sol_inicial_data)
-            mejor_sol, mejor_costo = Hill_Climbing(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
+            mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
             print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
         case '2': #En este caso la mejor solución es el greedy determinista
             archivo = 't2_Europa.txt'
@@ -315,7 +385,7 @@ if __name__ == '__main__':
                     if a == c['id_uav']:
                         sol_inicial_data.append(c)
             print(sol_inicial_data)
-            mejor_sol, mejor_costo = Hill_Climbing(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
+            mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
             print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
         case '3': #En este caso la mejor solución es el greedy determinista
             archivo = 't2_Titan.txt'
@@ -335,5 +405,5 @@ if __name__ == '__main__':
                     if a == c['id_uav']:
                         sol_inicial_data.append(c)
             print(sol_inicial_data)
-            mejor_sol, mejor_costo = Hill_Climbing(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
+            mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data) #Envía los ids de los uavs resultados del greedy.
             print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
