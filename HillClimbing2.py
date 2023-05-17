@@ -201,20 +201,20 @@ def generate_neighbors(current_state, premium):
                 break
     return current_state
 
-def generar_vecindario_completo(sol_inicial,premium,limite_vecinos):
+def generar_vecindario_completo(current_state,premium,limite_vecinos):
     #obtengo una solucion inicial y genero todos los vecinos posibles para luego escoger el que posee menor costo.
     vecinos = []
-    costo_inicial, sol_inicial = evaluate_state(sol_inicial)
+    costo_inicial, current_state = evaluate_state(current_state)
     menor_costo = costo_inicial
-    vecinos.append(sol_inicial)
+    vecinos.append(current_state)
     count = 0 
     if premium == 0:
         while True:
-            i = random.randint(0,len(sol_inicial)-1)
-            j = random.randint(0,len(sol_inicial)-1)
+            i = random.randint(0,len(current_state)-1)
+            j = random.randint(0,len(current_state)-1)
             if i != j:
-                sol_inicial[i], sol_inicial[j] = sol_inicial[j], sol_inicial[i]
-                sol,mejor_vecino  = evaluate_state(sol_inicial)
+                current_state[i], current_state[j] = current_state[j], current_state[i]
+                sol,mejor_vecino  = evaluate_state(current_state)
                 if sol < menor_costo:
                     menor_costo = sol
                     vecinos.append(mejor_vecino)
@@ -226,11 +226,11 @@ def generar_vecindario_completo(sol_inicial,premium,limite_vecinos):
 
     else:
         while True:
-            i = random.randint(1,len(sol_inicial)-1)
-            j = random.randint(1,len(sol_inicial)-1)
+            i = random.randint(1,len(current_state)-1)
+            j = random.randint(1,len(current_state)-1)
             if i != j:
-                sol_inicial[i], sol_inicial[j] = sol_inicial[j], sol_inicial[i]
-                sol,mejor_vecino  = evaluate_state(sol_inicial)
+                current_state[i], current_state[j] = current_state[j], current_state[i]
+                sol,mejor_vecino  = evaluate_state(current_state)
                 if sol < menor_costo:
                     menor_costo = sol
                     vecinos.append(mejor_vecino)
@@ -240,13 +240,19 @@ def generar_vecindario_completo(sol_inicial,premium,limite_vecinos):
                 count = count + 1 
 
     print('Costo inicial: ', costo_inicial)
-    #print('Solucion inicial: ', sol_inicial)
+    #print('Solucion inicial: ', current_state)
     print('Costo del mejor vecino: ', menor_costo)
     #print('Mejor vecino: ', vecinos[-1])
+    return vecinos[-1] 
 
-def Hill_Climbing_mejor_mejora(sol_inicial):
-    generar_vecindario_completo(sol_inicial,0,150)
-    
+def Hill_Climbing_mejor_mejora(current_state):
+    generar_vecindario_completo(current_state,0,150)
+    a = 0
+    #hacemos el recorrido para el mejor camino
+    while True:
+        if a!= 0:
+            
+
 def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial):
     neighbor_score = costo_inicial
     neighbor = sol_inicial #Arreglo de dicc
