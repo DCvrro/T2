@@ -171,7 +171,7 @@ def Hill_Climbing(caminoDeterminista, costoDeterminista):
         encontradoMejorVecino = False
         
         for vecino in vecinos:
-            costoVecino = evaluarCosto(vecino)
+            costoVecino = calcularCosto(vecino)
             
             if costoVecino < mejorCosto:
                 mejorCamino = vecino
@@ -184,6 +184,37 @@ def Hill_Climbing(caminoDeterminista, costoDeterminista):
     
     print("Mejor solución encontrada:", mejorCamino)
     print("Costo de la mejor solución:", mejorCosto)
+
+def generarVecinos(camino):
+    vecinos = []
+    
+    for i in range(len(camino)):
+        for j in range(i + 1, len(camino)):
+            vecino = copy.deepcopy(camino)
+            vecino[i], vecino[j] = vecino[j], vecino[i]
+            vecinos.append(vecino)
+    
+    return vecinos
+def calcularCosto(solucion, uavs):
+    costo = 0
+    uav_ant_id = 0
+
+    for index, uav in enumerate(solucion):
+        if index == 0:
+            uav['tiempo_aterrizaje'] = uav['midTime']
+            uav_ant_id = uav['id_uav']
+        else:
+            tiempo_aterrizaje = solucion[uav_ant_id - 1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id - 1]
+            if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']:
+                uav['tiempo_aterrizaje'] = tiempo_aterrizaje
+                costo += abs(tiempo_aterrizaje - uav['midTime'])
+                uav_ant_id = uav['id_uav']
+            else:
+                tiempo_aterrizaje = abs(solucion[uav_ant_id - 1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id - 1] - uav['midTime'])
+                uav['tiempo_aterrizaje'] = uav['botTime']
+                costo += tiempo_aterrizaje
+
+    return costo
 
 if __name__ == '__main__':
     #hacemos un match para saber que texto escoger
