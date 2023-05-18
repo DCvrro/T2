@@ -162,15 +162,26 @@ def gEstocastico(uavs):
     return uav_result, cost
 
 def generar_vecino(solucion):
+    # Copiar la solución
     vecino = copy.deepcopy(solucion)
+
+    # Seleccionar una posición aleatoria
     pos = random.randint(0, len(vecino) - 1)
+
+    # Obtener el UAV en la posición seleccionada
     uav = vecino[pos]
+
+    # Generar un nuevo tiempo de aterrizaje dentro del rango permitido
     nuevo_tiempo = random.randint(uav['botTime'], uav['topTime'])
+
+    # Actualizar el tiempo de aterrizaje del UAV en el vecino
     uav['tiempo_aterrizaje'] = nuevo_tiempo
+
     return vecino
 
 
 def evaluar(solucion):
+    # Calcular el costo de la solución
     costo = 0
     for i in range(len(solucion) - 1):
         costo += abs(solucion[i]['tiempo_aterrizaje'] - solucion[i + 1]['tiempo_aterrizaje'])
@@ -179,7 +190,7 @@ def evaluar(solucion):
 def tabu_search(solucion_inicial, lista_tabu_size, num_iteraciones):
     mejor_solucion = copy.deepcopy(solucion_inicial)
     mejor_costo = evaluar(mejor_solucion)
-    lista_tabu = [copy.deepcopy(mejor_solucion)]
+    lista_tabu = [copy.deepcopy(mejor_solucion)]  # Agregamos la solución inicial a la lista tabú
     list_t2 = []
     for uavs in mejor_solucion:
         list_t2.append(uavs.get('id_uav'))
@@ -189,7 +200,7 @@ def tabu_search(solucion_inicial, lista_tabu_size, num_iteraciones):
         vecinos = []
         for _ in range(lista_tabu_size):
             vecino = generar_vecino(mejor_solucion)
-            while vecino in lista_tabu:
+            while vecino in lista_tabu:  # Evitamos generar vecinos repetidos
                 vecino = generar_vecino(mejor_solucion)
             vecinos.append(copy.deepcopy(vecino))
 
@@ -205,6 +216,7 @@ def tabu_search(solucion_inicial, lista_tabu_size, num_iteraciones):
         if len(lista_tabu) > lista_tabu_size:
             lista_tabu.pop(0)
             list_t2.pop(0)
+        #print(list_t2)
         iteracion += 1
 
     return mejor_solucion, mejor_costo
@@ -235,11 +247,11 @@ if __name__ == '__main__':
     solucion, costo = tabu_search(copy.deepcopy(caminoDeterminista), lista_tabu_size, num_iteraciones)
 
     print("Costo Tabu Search:",costo)
-    if(caminoDeterminista != solucion):
-        print("Camino Determinista:",caminoDeterminista)
-        print("Camino Tabu Search:",solucion)
-    else: 
-        print("son iguales los caminos.") 
+    #if(caminoDeterminista != solucion):
+    #    print("Camino Determinista:",caminoDeterminista)
+    #    print("Camino Tabu Search:",solucion)
+    #else: 
+    #    print("son iguales los caminos.") 
     print("Diferencia de Costos:",costoDeterminista-costo)
 
     
