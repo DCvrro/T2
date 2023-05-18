@@ -80,8 +80,8 @@ def gEstocastico(uavs):
             break
     while((len(uavs)) != 0):
         if i == 0 and premium == False: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
-            nR = random.randint(0,len(uavs)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
-            this_uav = uavs[nR]
+            SEED = 0 #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
+            this_uav = uavs[SEED]
             this_uav['tiempo_aterrizaje'] = this_uav['midTime']
             uav_ant = this_uav
             (show_uavs_info(this_uav,cost))
