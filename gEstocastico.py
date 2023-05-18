@@ -63,6 +63,7 @@ def gEstocastico(uavs):
     ##Vamos a generar una lista con los ids de cada uav para despues acceder de forma aleatoria a ellos mediante el greedy estocastico.
     cost = 0
     cant = len(uavs)
+    uav_result = []
     tmpAterrizaje = 0
     i = 0 
     midTime = []
@@ -84,8 +85,8 @@ def gEstocastico(uavs):
             this_uav = uavs[SEED]
             this_uav['tiempo_aterrizaje'] = this_uav['midTime']
             uav_ant = this_uav
-            (show_uavs_info(this_uav,cost))
             uavs.remove(this_uav)
+            show_uavs_info(this_uav,cost)
             i =  1 
             #Calculamos las probabilidades de cada uav segun midtime/ midtimetotal
             probUavs = []
@@ -96,8 +97,8 @@ def gEstocastico(uavs):
             this_uav = uavs[premiumID-1]
             this_uav['tiempo_aterrizaje'] = this_uav['midTime']
             uav_ant = this_uav
-            (show_uavs_info(this_uav,cost))
             uavs.remove(this_uav)
+            show_uavs_info(this_uav,cost)
             i =  1
             #Calculamos las probabilidades de cada uav segun midtime/ midtimetotal
             probUavs = []
@@ -116,8 +117,8 @@ def gEstocastico(uavs):
                 this_uav['tiempo_aterrizaje'] = tmpAterrizaje                
                 cost = cost + abs(tmpAterrizaje - this_uav['midTime']) # calculo los costos
                 uav_ant = this_uav # Guardo en una temporal la informacion de uav
-                (show_uavs_info(this_uav,cost) ) # muestro la informacion
                 uavs.remove(this_uav) # Elimino el uav usado para no repetirlo
+                show_uavs_info(this_uav,cost)
                 probUavs = [] # Reinicio la probabilidad de los uavs.
                 for uav in uavs:
                     probUavs.append(uav['midTime']/midTimeTotal)
@@ -126,12 +127,12 @@ def gEstocastico(uavs):
                 this_uav['tiempo_aterrizaje'] = this_uav['botTime']
                 cost = cost + tmpAterrizaje
                 uav_ant = this_uav
-                show_uavs_info(this_uav,cost)
                 uavs.remove(this_uav)
+                show_uavs_info(this_uav,cost)
                 probUavs = [] # Reinicio la probabilidad de los uavs.
                 for uav in uavs:
                     probUavs.append(uav['midTime']/midTimeTotal)
-            i = i + 1 
+        i = i + 1
     print("Se leyeron ",i, " uavs")
 
 def show_uavs_info(uav,cost): 
@@ -159,21 +160,21 @@ def printUAVs(uavs):
         print("")
 
 if __name__ == '__main__':
-    print('Archivo a leer para aplicar Greedy Determinista \n 1.- t2_Deimos.txt \n 2.- t2_Europa.txt \n 3.- t2_Titan.txt')
+    print('Archivo a leer para aplicar Greedy Estocástico \n 1.- t2_Deimos.txt \n 2.- t2_Europa.txt \n 3.- t2_Titan.txt')
     choose = input()
     match choose:
         case '1':
             archivo = 't2_Deimos.txt'
-            uavs = leer(archivo)
-            #printUAVs(uavs)
-            gEstocastico(uavs)
+            for i in range(5):
+                uavs = leer(archivo)
+                gEstocastico(uavs)
         case '2':
             archivo = 't2_Europa.txt'
-            uavs = leer(archivo) 
-            #printUAVs(uavs)
-            gEstocastico(uavs)
+            for i in range(5):
+                uavs = leer(archivo)
+                gEstocastico(uavs)
         case '3':
             archivo = 't2_Titan.txt'
-            uavs = leer(archivo) 
-            #printUAVs(uavs)
-            gEstocastico(uavs)
+            for i in range(5):
+                uavs = leer(archivo)
+                gEstocastico(uavs)

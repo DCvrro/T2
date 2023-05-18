@@ -57,54 +57,37 @@ def leer(archivo):
                             drones.append(uav)
     return drones
 
+#FUNCIÓN QUE EJECUTA EL GREEDY DETERMINISTA.
 def gDeterminista(uavs):
     cost = 0
     uav_ant_id = 0
-    #print(uavs)
-    uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #UAVs ordenados de menor a mayor por medio del tiempo preferente
-    #print('\n Uavs ordenados por tiempo preferente')
-    #print('\n')
+    uavs_orden = sorted(uavs, key=lambda uavs: uavs['midTime'], reverse=False) #UAVS ORDENADOS DE MENOR A MAYOR POR MEDIO DEL TIEMPO PREFERENTE.
     
-    for index, uav in enumerate(uavs_orden):
-        if index == 0: #Primer UAV en aterrizar asumiendo que cae en su tiempo preferente
+    for index, uav in enumerate(uavs_orden): #SE RECORREN LOS UAVS PREVIAMENTE ORDENADOS.
+        if index == 0: #PRIMER UAVS EN ATERRIZAR LO DESIGNAMOS EN QUE SU TIEMPO DE ATERRIZAJE ES IGUAL A SU TIEMPO PREFERENTE.
             uav['tiempo_aterrizaje'] = uav['midTime']
-            cost = cost + 0
+            cost = cost + 0 #GENERAMOS COSTO CERO POR ESTABLECER EL ATERRIZAJE DEL PRIMER UAV EN SU TIEMPO PREFERENTE.
             uav_ant_id = uav['id_uav']
             show_uavs_determinista(uav,cost)
         else:
-            tiempo_aterrizaje = uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]      #uav['midTime'] + uavs_orden[index-1]['times'][index]
-            if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #Los uavs no pueden caer mas allá del tiempo máximo de aterrizaje
+            tiempo_aterrizaje = uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1] #CALCULO PARA EL TIEMPO DE ATERRIZAJE DE LOS DEMÁS UAVS.
+            if tiempo_aterrizaje <= uav['topTime'] and tiempo_aterrizaje >= uav['botTime']: #VERIRIFICACIÓN DE QUE LOS UAVS NO PUEDEN ATERRIZAR FUERA DEL RANGO ESTABLECIDO POR EL TIEMPO MENOR Y TIEMPO MAYOR.
                 uav['tiempo_aterrizaje'] = tiempo_aterrizaje
-                cost = cost + abs(tiempo_aterrizaje - uav['midTime'])
+                cost = cost + abs(tiempo_aterrizaje - uav['midTime']) #SE REALIZA EL CÁLCULO DEL COSTO.
                 uav_ant_id = uav['id_uav']
             else:
-                #print('\n UAV ',uav['id_uav'],' no puede aterrizar en un principio.')
-                #print('......')
                 print('Se extiende su tiempo de aterrizaje para que pueda aterrizar.')
-                tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1] - uav['midTime']) #uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1]
-                uav['tiempo_aterrizaje'] = uav['botTime']
-                cost = cost + tiempo_aterrizaje
+                tiempo_aterrizaje =  abs(uavs[uav_ant_id-1]['tiempo_aterrizaje'] + uav['times'][uav_ant_id-1] - uav['midTime']) #EL MISMO CÁLCULO QUE EN EL IF ANTERIOR.
+                uav['tiempo_aterrizaje'] = uav['botTime'] #COMO EL UAV EN ESTE CASO ATERRIZARÍÁ FUERA DEL RANGO PERMITIDO, ENTONCES SE LE OBLIGA A QUE ESTE CAIGO LO ANTES POSIBLE DENTRO DE SU RANGO. EN EL TIEMPO MENOR.
+                cost = cost + tiempo_aterrizaje #MISMO CÁLCULO DEL COSTO.
             show_uavs_determinista(uav,cost)
-    #print(uavs_orden)
-
     print('Costo Total: ',cost)
  
+#FUNCIÓN PARA MOSTRAR A LOS UAVS EN EL PROCESAMIENTO DEL GREEDY DETERMINISTA.
 def show_uavs_determinista(uav,cost): 
     print(' ID :',uav.get('id_uav')," | Tiempo de aterrizaje: ", uav.get('tiempo_aterrizaje'), ' | Costo actual: ', cost)
 
-
-#Mostrar uavs, me dio paja copiar y pegar todo el rato el for para imprimirlos.
-def show_uavs(uavs):
-    b = True
-    large = len(uavs) 
-    for uav in uavs: 
-        if b :
-            print("UAVs :", large  ) 
-            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime'),'|', uav.get('times'))
-            b = False
-        else:
-            print(' ID :',uav.get('id_uav')," | ", 'Range :', uav.get('botTime')," | ", uav.get('midTime')," | ",uav.get('topTime'),'|', uav.get('times')) 
-
+#MAIN DEL PROGRAMA
 if __name__ == '__main__':
     print('Archivo a leer para aplicar Greedy Determinista \n 1.- t2_Deimos.txt \n 2.- t2_Europa.txt \n 3.- t2_Titan.txt')
     choose = input()
