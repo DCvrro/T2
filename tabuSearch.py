@@ -342,6 +342,6 @@ if __name__ == '__main__':
     uavs = leer(ar)
     caminoDeterminista, costoDeterminista = gDeterminista(uavs)
     print("Costo Determinista:",costoDeterminista)
-    mejorCamino, mejorCosto = Tabu_Search(caminoDeterminista, costoDeterminista, tabu_list_size=100, num_iterations= 10000, count_neighbors=100)
+    mejorCamino, mejorCosto = tabu_search(caminoDeterminista, costoDeterminista, tabu_list_size=100, num_iterations= 10000)# count_neighbors=100)
     print ("Mejor Costo:", mejorCosto) 
-    print('Mejor camino ', mejorCamino)
+    #print('Mejor camino ', mejorCamino)
