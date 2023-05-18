@@ -86,12 +86,11 @@ def gEstocastico(uavs):
     ##Vamos a generar una lista con los ids de cada uav para despues acceder de forma aleatoria a ellos mediante el greedy estocastico.
     cost = 0
     cant = len(uavs)
+    uav_result = []
     tmpAterrizaje = 0
     i = 0 
     midTime = []
     midTimeTotal = 0 
-    uav_result = []
-
     for uav in uavs: 
         midTime.append(uav['midTime'])
         midTimeTotal = midTimeTotal + uav['midTime']
@@ -105,11 +104,10 @@ def gEstocastico(uavs):
             break
     while((len(uavs)) != 0):
         if i == 0 and premium == False: # el primer uav me permite darle el tiempo de aterrizaje que yo quiera
-            nR = random.randint(0,len(uavs)-1) #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
-            this_uav = uavs[nR]
+            SEED = 0 #Genero un numero aleatorio para acceder a un uav de la lista de uavs ordenados
+            this_uav = uavs[SEED]
             this_uav['tiempo_aterrizaje'] = this_uav['midTime']
             uav_ant = this_uav
-            uav_result.append(this_uav)
             uavs.remove(this_uav)
             i =  1 
             #Calculamos las probabilidades de cada uav segun midtime/ midtimetotal
@@ -121,7 +119,6 @@ def gEstocastico(uavs):
             this_uav = uavs[premiumID-1]
             this_uav['tiempo_aterrizaje'] = this_uav['midTime']
             uav_ant = this_uav
-            uav_result.append(this_uav)
             uavs.remove(this_uav)
             i =  1
             #Calculamos las probabilidades de cada uav segun midtime/ midtimetotal
@@ -141,7 +138,6 @@ def gEstocastico(uavs):
                 this_uav['tiempo_aterrizaje'] = tmpAterrizaje                
                 cost = cost + abs(tmpAterrizaje - this_uav['midTime']) # calculo los costos
                 uav_ant = this_uav # Guardo en una temporal la informacion de uav
-                uav_result.append(this_uav)
                 uavs.remove(this_uav) # Elimino el uav usado para no repetirlo
                 probUavs = [] # Reinicio la probabilidad de los uavs.
                 for uav in uavs:
@@ -151,14 +147,13 @@ def gEstocastico(uavs):
                 this_uav['tiempo_aterrizaje'] = this_uav['botTime']
                 cost = cost + tmpAterrizaje
                 uav_ant = this_uav
-                uav_result.append(this_uav)
                 uavs.remove(this_uav)
                 probUavs = [] # Reinicio la probabilidad de los uavs.
                 for uav in uavs:
                     probUavs.append(uav['midTime']/midTimeTotal)
-            i = i + 1 
-        
-    print("Se leyeron ",i, " uavs")
+            i = i + 1
+            uav_result.append(this_uav)
+        #print("Se leyeron ",i, " uavs")
     return uav_result, cost
 
 def generar_vecino(solucion):
@@ -238,8 +233,8 @@ if __name__ == '__main__':
         case '3':
             ar = 't2_Titan.txt'
     uavs = leer(ar)
-    caminoDeterminista, costoDeterminista = gDeterminista(uavs)
-    print("Costo Determinista:",costoDeterminista)
+    caminoDeterminista, costoDeterminista = gEstocastico(uavs)
+    print("Costo Estocastico:",costoDeterminista)
     #ahora ejecutamos el tabu y mostramos sus resultados
     solucion_inicial = caminoDeterminista
     lista_tabu_size = 10
@@ -252,7 +247,7 @@ if __name__ == '__main__':
     #    print("Camino Tabu Search:",solucion)
     #else: 
     #    print("son iguales los caminos.") 
-    print("Diferencia de Costos:",costoDeterminista-costo)
+    #print("Diferencia de Costos:",costoDeterminista-costo)
 
     
 
