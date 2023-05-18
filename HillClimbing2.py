@@ -184,37 +184,44 @@ import itertools
 
 def Hill_Climbing(caminoDeterminista, costoDeterminista):
     mejorCamino = copy.deepcopy(caminoDeterminista)
-    mejorCosto = costoDeterminista
+    mejorCostoVecino = costoDeterminista
+    a = 0
+    mejorVecino = copy.deepcopy(caminoDeterminista)
 
-    while True:
-        vecinos = generar_todos_los_vecinos(mejorCamino)
-        mejorVecino = None
-        mejorCostoVecino = float('inf')
-
+    while a < 1000:
+        if mejorVecino[0]['botTime'] == 0 and mejorVecino[0]['midTime'] == 0 and mejorVecino[0]['topTime'] == 0:
+            vecinos = generar_todos_los_vecinos(mejorVecino,0)
+        else:
+            vecinos = generar_todos_los_vecinos(mejorVecino,1)
         for vecino in vecinos:
             costoVecino = calcular_costo(vecino)
-
+            #print(vecino, costoVecino)
             if costoVecino < mejorCostoVecino:
+                print('Estoy ', costoVecino)
                 mejorVecino = vecino
                 mejorCostoVecino = costoVecino
+                break
 
-        if mejorCostoVecino < mejorCosto:
-            mejorCamino = mejorVecino
-            mejorCosto = mejorCostoVecino
-        else:
-            break
-
+        #if mejorCostoVecino < mejorCosto:
+         #   mejorCamino = mejorVecino
+          #  mejorCosto = mejorCostoVecino
+        a = a + 1
     return mejorCamino, mejorCosto
 
-def generar_todos_los_vecinos(camino):
+def generar_todos_los_vecinos(camino, premium):
     vecinos = []
-
-    for i in range(len(camino)):
-        for j in range(i + 1, len(camino)):
-            vecino = copy.deepcopy(camino)
-            vecino[i], vecino[j] = vecino[j], vecino[i]
-            vecinos.append(vecino)
-
+    if premium == 0:
+        for i in range(1,len(camino)):
+            for j in range(i + 1, len(camino)):
+                vecino = copy.deepcopy(camino)
+                vecino[i], vecino[j] = vecino[j], vecino[i]
+                vecinos.append(vecino)
+    else:
+        for i in range(len(camino)):
+            for j in range(i + 1, len(camino)):
+                vecino = copy.deepcopy(camino)
+                vecino[i], vecino[j] = vecino[j], vecino[i]
+                vecinos.append(vecino)
     return vecinos
 
 def generar_vecino(camino):

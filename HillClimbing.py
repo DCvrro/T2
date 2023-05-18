@@ -247,6 +247,7 @@ def Hill_Climbing_alguna_mejora(sol_inicial, costo_inicial, max_iter):
         else:
             neighbor_actual = generate_neighbors(neighbor_ant,0)
             neighbor_score_actual, neighbor_actual = evaluate_state(neighbor_actual)
+
         if max_iter-1 == a and igual_score != 0 and distinta == 0:
             print('Sol inicial ya que ninguna fue mejor, pero otras daban lo mismo')
             return sol_inicial_aux, costo_inicial
@@ -415,9 +416,9 @@ if __name__ == '__main__':
                         for c in uavs_original:
                             if a == c['id_uav']:
                                 sol_inicial_data.append(c)
-                    print(costo_inicial)
+                    #print(costo_inicial)
                     #print('Hola ', sol_inicial_data)
-                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial, max_iter = 1000) #Envía los ids de los uavs resultados del greedy.
+                    mejor_sol, mejor_costo = Hill_Climbing_alguna_mejora(sol_inicial_data, costo_inicial, max_iter = 50) #Envía los ids de los uavs resultados del greedy.
                     print('\n Mejor solución :',mejor_sol,' con costo: ',mejor_costo)
                 case '2':
                     for d in range(5):
