@@ -161,37 +161,6 @@ def gEstocastico(uavs):
     print("Se leyeron ",i, " uavs")
     return uav_result, cost
 
-def tabu_search(solucion_inicial, lista_tabu_size, num_iteraciones):
-    # Inicialización
-    mejor_solucion = copy.deepcopy(solucion_inicial)
-    mejor_costo = evaluar(solucion_inicial)
-    lista_tabu = []
-
-    # Bucle principal
-    for _ in range(num_iteraciones):
-        # Generar solución vecina
-        vecino = generar_vecino(mejor_solucion)
-
-        # Evaluar el vecino
-        costo_vecino = evaluar(vecino)
-
-        # Verificar si el vecino está en la lista tabú
-        if vecino in lista_tabu:
-            continue
-
-        # Actualizar la mejor solución si el vecino es mejor
-        if costo_vecino < mejor_costo:
-            mejor_solucion = copy.deepcopy(vecino)
-            mejor_costo = costo_vecino
-
-        # Actualizar la lista tabú
-        lista_tabu.append(vecino)
-
-        # Mantener el tamaño de la lista tabú
-        if len(lista_tabu) > lista_tabu_size:
-            lista_tabu.pop(0)
-
-    return mejor_solucion, mejor_costo
 def generar_vecino(solucion):
     # Copiar la solución
     vecino = copy.deepcopy(solucion)
@@ -204,12 +173,44 @@ def generar_vecino(solucion):
     vecino[pos1], vecino[pos2] = vecino[pos2], vecino[pos1]
 
     return vecino
+
 def evaluar(solucion):
     # Calcular el costo de la solución
     costo = 0
     for i in range(len(solucion) - 1):
         costo += abs(solucion[i]['tiempo_aterrizaje'] - solucion[i + 1]['tiempo_aterrizaje'])
     return costo
+
+def tabu_search(solucion_inicial, lista_tabu_size, num_iteraciones):
+    mejor_solucion = copy.deepcopy(solucion_inicial)
+    mejor_costo = evaluar(mejor_solucion)
+    lista_tabu = [copy.deepcopy(mejor_solucion)]  # Agregamos la solución inicial a la lista tabú
+
+    iteracion = 0
+    while iteracion < num_iteraciones:
+        vecinos = []
+        for _ in range(lista_tabu_size):
+            vecino = generar_vecino(mejor_solucion)
+            while vecino in lista_tabu:  # Evitamos generar vecinos repetidos
+                vecino = generar_vecino(mejor_solucion)
+            vecinos.append(copy.deepcopy(vecino))
+
+        mejor_vecino = min(vecinos, key=lambda x: evaluar(x))
+        costo_vecino = evaluar(mejor_vecino)
+
+        if costo_vecino < mejor_costo:
+            mejor_solucion = copy.deepcopy(mejor_vecino)
+            mejor_costo = costo_vecino
+
+        lista_tabu.append(copy.deepcopy(mejor_vecino))
+        if len(lista_tabu) > lista_tabu_size:
+            lista_tabu.pop(0)
+
+        iteracion += 1
+
+    return mejor_solucion, mejor_costo
+
+
 
 if __name__ == '__main__':
     
@@ -232,10 +233,14 @@ if __name__ == '__main__':
     solucion_inicial = caminoDeterminista
     lista_tabu_size = 10
     num_iteraciones = 1000
-    solucion, costo = tabu_search(solucion_inicial, lista_tabu_size, num_iteraciones)
+    solucion, costo = tabu_search(copy.deepcopy(caminoDeterminista), lista_tabu_size, num_iteraciones)
     print("Costo Tabu Search:",costo)
-    #print("Camino Tabu Search:",solucion)
-    #print("Camino Determinista:",caminoDeterminista)
+    if(caminoDeterminista != solucion):
+        print("Camino Determinista:",caminoDeterminista)
+        print("Camino Tabu Search:",solucion)
+    else:
+
+        print("son iguales los caminos.") 
     print("Diferencia de Costos:",costoDeterminista-costo)
 
     
